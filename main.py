@@ -10,7 +10,7 @@ mkp_donate = telebot.types.KeyboardButton('Поддержать проект')
 markup.row(mkp_newproduct, mkp_support)
 markup.row(mkp_donate)
 
-log = open("log.txt", "w", encoding = "utf-8")
+
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -22,39 +22,52 @@ def ban_user(message):
 
 @bot.message_handler(regexp = "Создать новый товар")
 def first_step(message):
+    global log
+    log = open("log.txt", "w", encoding = "utf-8")
     bot.send_message(message.chat.id, "Пожалуйста введите:", reply_markup = None)
     msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = None)
     bot.register_next_step_handler(msg, second_step)
 
 def second_step(message):
+    global log
     log.write("Название: " + message.text + "\n")
     msg = bot.send_message(message.chat.id, "2. Описание  товара")
     bot.register_next_step_handler(msg, third_step)
 
 def third_step(message):
+    global log
     log.write("Описание: " + message.text + "\n")
     msg = bot.send_message(message.chat.id, "3. Цена товара")
     bot.register_next_step_handler(msg, fourth_step)
 
 def fourth_step(message):
+    global log
     log.write("Цена: " + message.text + "\n")
     msg = bot.send_message(message.chat.id, "4. Ваш город")
     bot.register_next_step_handler(msg, fifth_step)
         
 def fifth_step(message):
+    global log
     log.write("Город: " + message.text + "\n")
     msg = bot.send_message(message.chat.id, "5. Ваш никнейм в телеграме (например @username)")
     bot.register_next_step_handler(msg, sixth_step)
 
 def sixth_step(message):
+    global log
     log.write("Никнейм: " + message.text + "\n")
-    bot.send_message(message.chat.id, "Заявка отправлена на модерацию")
+    msg = bot.send_message(message.chat.id, "6. Фото")
     log.close()
+    bot.register_next_step_handler(msg, seventh_step)
+
+def seventh_step(message):
     loger = open("log.txt", "r", encoding = "utf-8")
-    text = loger.read()
-    print(text)
-    bot.send_message(ADMIN_ID, text)
-    loger.close()
+    try:
+        bot.send_photo(ADMIN_ID, message.photo[1].file_id, loger.read())
+        bot.send_message(message.chat.id, "Заявка отправлена на модерацию")
+    except:
+        msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз")
+        bot.register_next_step_handler(msg, seventh_step)
+
 
 bot.enable_save_next_step_handlers(delay = 2)
 bot.load_next_step_handlers()
