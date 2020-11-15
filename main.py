@@ -71,7 +71,7 @@ def support(message):
 @bot.message_handler(regexp = "Поддержать проект")
 def donate(message):
     photo = open("img/qr.jpg", "rb")
-    bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: EQDMEdLrfKYcQsS2a34hgQxWZfpaD91sbtL9eQpis0TmybgN или отсканируйте QR код в приложении TON Surf")
+    bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: EQDMEdLrfKYcQsS2a34hgQxWZfpaD91sbtL9eQpis0TmybgN или отсканируйте QR код")
     
 
 @bot.message_handler(content_types = ["text"])
