@@ -14,7 +14,7 @@ mkp_skip = telebot.types.KeyboardButton('Пропустить')
 mkp_vip = telebot.types.KeyboardButton('Купить VIP 💎')
 
 markup.row(mkp_newproduct, mkp_support)
-markup.row(mkp_donate, mkp_vip)
+markup.row(mkp_donate)
 markup_appeal.row(mkp_cancel)
 
 
