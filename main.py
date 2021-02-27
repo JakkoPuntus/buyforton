@@ -117,18 +117,21 @@ def support_first(message):
     bot.register_next_step_handler(msg, support)
 
 def support(message):
-    bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
-    bot.forward_message(nextAdmin, message.chat.id, message.message_id)
-    bot.send_message(message.chat.id, "Ваше обращение принято, мы вам ответим")
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
+        bot.forward_message(nextAdmin, message.chat.id, message.message_id)
+        bot.send_message(message.chat.id, "Ваше обращение принято, мы вам ответим")
 
 @bot.message_handler(regexp = "Поддержать проект")
 def donate(message):
-    photo = open("img/qr.png", "rb")
-    bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: 0:96bb71fde16dc04cf3721f66a1b959cc32c5842a5877965d37f6bd894b1bf608 или отсканируйте QR код")
+    photo = open("img/qr_vip.png", "rb")
+    bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: 0:662c32971dbe7d21d71eee8e3f2a0bf8adb73521ee3779090a4910b7742b0b2f или отсканируйте QR код")
     
 @bot.message_handler(regexp = "Купить VIP 💎")
 def buy_vip(message):
-    photo = open("img/qr.png", "rb")
+    photo = open("img/qr_vip.png", "rb")
     bot.send_photo(message.chat.id, photo, "Чтобы приобрести VIP, отправьте n TON по адресу: 0:662c32971dbe7d21d71eee8e3f2a0bf8adb73521ee3779090a4910b7742b0b2f или отсканируйте QR код (QR пока не тот)")
 
 @bot.message_handler(content_types = ["text"])
