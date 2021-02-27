@@ -4,12 +4,17 @@ from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, form
 bot = telebot.TeleBot(TOKEN, num_threads = 4)
 
 markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+markup_appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+
 mkp_newproduct = telebot.types.KeyboardButton('Создать новый товар')
 mkp_support = telebot.types.KeyboardButton('Написать в техподдержку')
 mkp_donate = telebot.types.KeyboardButton('Поддержать проект')
+mkp_cancel = telebot.types.KeyboardButton('Отменить')
+mkp_skip = telebot.types.KeyboardButton('Пропустить')
+
 markup.row(mkp_newproduct, mkp_support)
 markup.row(mkp_donate)
-
+markup_appeal.row(mkp_cancel)
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -23,51 +28,82 @@ def ban_user(message):
 @bot.message_handler(regexp = "Создать новый товар")
 def first_step(message):
     global log
-    log = open("log.txt", "w", encoding = "utf-8")
-    bot.send_message(message.chat.id, "Пожалуйста введите:", reply_markup = None)
-    msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = None)
+    global name
+    name = str(message.chat.id) + ".txt"
+    try:
+        log = open(name, "x", encoding = "utf-8")
+    except:
+        log = open(name, "r+", encoding = "utf-8")
+    bot.send_message(message.chat.id, "Пожалуйста введите:", reply_markup = markup_appeal)
+    msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = markup_appeal)
     bot.register_next_step_handler(msg, second_step)
 
 def second_step(message):
     global log
-    log.write("Название: " + message.text + "\n")
-    msg = bot.send_message(message.chat.id, "2. Описание  товара")
-    bot.register_next_step_handler(msg, third_step)
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        log.write("Название: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "2. Описание  товара", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, third_step)
 
 def third_step(message):
     global log
-    log.write("Описание: " + message.text + "\n")
-    msg = bot.send_message(message.chat.id, "3. Цена товара")
-    bot.register_next_step_handler(msg, fourth_step)
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        log.write("Описание: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "3. Цена товара", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, fourth_step)
 
 def fourth_step(message):
     global log
-    log.write("Цена: " + message.text + "\n")
-    msg = bot.send_message(message.chat.id, "4. Ваш город")
-    bot.register_next_step_handler(msg, fifth_step)
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        log.write("Цена: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "4. Ваш город", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, fifth_step)
         
 def fifth_step(message):
     global log
-    log.write("Город: " + message.text + "\n")
-    msg = bot.send_message(message.chat.id, "5. Ваш никнейм в телеграме (например @username)")
-    bot.register_next_step_handler(msg, sixth_step)
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        log.write("Город: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "5. Ваш никнейм в телеграме (например @username)", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, sixth_step)
 
 def sixth_step(message):
     global log
-    log.write("Никнейм: " + message.text + "\n")
-    msg = bot.send_message(message.chat.id, "6. Фото")
-    log.close()
-    bot.register_next_step_handler(msg, seventh_step)
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        log.write("Никнейм: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "6. Фото", reply_markup = markup_appeal)
+        log.close()
+        bot.register_next_step_handler(msg, seventh_step)
 
 def seventh_step(message):
-    loger = open("log.txt", "r", encoding = "utf-8")
-    try:
-        bot.send_photo(ADMIN_ID, message.photo[1].file_id, loger.read())
-        bot.send_photo(nextAdmin, message.photo[1].file_id, loger.read())
-        bot.send_message(message.chat.id, "Заявка отправлена на модерацию")
-    except:
-        msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз")
-        bot.register_next_step_handler(msg, seventh_step)
+    global log
+    global name
+    loger = open(name, "r", encoding = "utf-8")
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        try:
+            bot.send_photo(ADMIN_ID, message.photo[1].file_id, loger.read())
+            bot.send_message(message.chat.id, "Заявка отправлена на модерацию", reply_markup=markup)
+        except:
+            msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markup_appeal)
+            bot.register_next_step_handler(msg, seventh_step)
+        try:
+            bot.send_photo(nextAdmin, message.photo[1].file_id, loger.read())
+        except Exception as e:
+            print("blya")
+            print(e)
+
+            
 
 
 bot.enable_save_next_step_handlers(delay = 2)
@@ -85,18 +121,18 @@ def support(message):
 
 @bot.message_handler(regexp = "Поддержать проект")
 def donate(message):
-    photo = open("img/qr.jpg", "rb")
-    bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: EQDMEdLrfKYcQsS2a34hgQxWZfpaD91sbtL9eQpis0TmybgN или отсканируйте QR код")
+    photo = open("img/qr.png", "rb")
+    bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: 0:96bb71fde16dc04cf3721f66a1b959cc32c5842a5877965d37f6bd894b1bf608 или отсканируйте QR код")
     
 
 @bot.message_handler(content_types = ["text"])
 def repeat_all_messages(message):
-    if message.chat.id == ADMIN_ID or message.chat.id == nextAdmin:
+    if message.chat.id == ADMIN_ID:
         try:
             print(message.reply_to_message.message_id)
             bot.send_message(message.reply_to_message.chat.id, message.text,  reply_markup = markup)
-        except:
-            print("None")
+        except Exception as e:
+            print(e)
 
 
 
