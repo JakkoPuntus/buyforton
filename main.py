@@ -11,9 +11,10 @@ mkp_support = telebot.types.KeyboardButton('Написать в техподде
 mkp_donate = telebot.types.KeyboardButton('Поддержать проект')
 mkp_cancel = telebot.types.KeyboardButton('Отменить')
 mkp_skip = telebot.types.KeyboardButton('Пропустить')
+mkp_vip = telebot.types.KeyboardButton('Купить VIP 💎')
 
 markup.row(mkp_newproduct, mkp_support)
-markup.row(mkp_donate)
+markup.row(mkp_donate, mkp_vip)
 markup_appeal.row(mkp_cancel)
 
 
@@ -125,6 +126,10 @@ def donate(message):
     photo = open("img/qr.png", "rb")
     bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: 0:96bb71fde16dc04cf3721f66a1b959cc32c5842a5877965d37f6bd894b1bf608 или отсканируйте QR код")
     
+@bot.message_handler(regexp = "Купить VIP 💎")
+def buy_vip(message):
+    photo = open("img/qr.png", "rb")
+    bot.send_photo(message.chat.id, photo, "Чтобы приобрести VIP, отправьте n TON по адресу: 0:662c32971dbe7d21d71eee8e3f2a0bf8adb73521ee3779090a4910b7742b0b2f или отсканируйте QR код (QR пока не тот)")
 
 @bot.message_handler(content_types = ["text"])
 def repeat_all_messages(message):
