@@ -88,17 +88,18 @@ def seventh_step(message):
     global log
     global name
     loger = open(name, "r", encoding = "utf-8")
+    appeal = loger.read()
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         try:
-            bot.send_photo(ADMIN_ID, message.photo[1].file_id, loger.read())
+            bot.send_photo(ADMIN_ID, message.photo[1].file_id,appeal)
             bot.send_message(message.chat.id, "Заявка отправлена на модерацию", reply_markup=markup)
         except:
             msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markup_appeal)
             bot.register_next_step_handler(msg, seventh_step)
         try:
-            bot.send_photo(nextAdmin, message.photo[1].file_id, loger.read())
+            bot.send_photo(nextAdmin, message.photo[1].file_id, appeal)
         except Exception as e:
             print("blya")
             print(e)
