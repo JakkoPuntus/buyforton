@@ -63,6 +63,7 @@ def seventh_step(message):
     loger = open("log.txt", "r", encoding = "utf-8")
     try:
         bot.send_photo(ADMIN_ID, message.photo[1].file_id, loger.read())
+        bot.send_photo(nextAdmin, message.photo[1].file_id, loger.read())
         bot.send_message(message.chat.id, "Заявка отправлена на модерацию")
     except:
         msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз")
@@ -79,6 +80,7 @@ def support_first(message):
 
 def support(message):
     bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
+    bot.forward_message(nextAdmin, message.chat.id, message.message_id)
     bot.send_message(message.chat.id, "Ваше обращение принято, мы вам ответим")
 
 @bot.message_handler(regexp = "Поддержать проект")
@@ -89,7 +91,7 @@ def donate(message):
 
 @bot.message_handler(content_types = ["text"])
 def repeat_all_messages(message):
-    if message.chat.id == ADMIN_ID:
+    if message.chat.id == ADMIN_ID or message.chat.id == nextAdmin:
         try:
             print(message.reply_to_message.message_id)
             bot.send_message(message.reply_to_message.chat.id, message.text,  reply_markup = markup)
