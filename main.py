@@ -129,7 +129,7 @@ def support_first(message):
 
 def support(message):
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "отменено", reply_markup = markup)
     else:
         bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
         bot.forward_message(nextAdmin, message.chat.id, message.message_id)
