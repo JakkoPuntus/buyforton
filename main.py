@@ -63,8 +63,8 @@ def delivery(message):
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Описание: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "4. Цена Доставка", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, city)
+        msg = bot.send_message(message.chat.id, "4.Доставка по РБ (цена и условия)", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, nickname)
 
 def city(message):
     global log
@@ -72,7 +72,7 @@ def city(message):
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Цена: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "4. Ваш город", reply_markup = markup_appeal)
+        msg = bot.send_message(message.chat.id, "5. Ваш город", reply_markup = markup_appeal)
         bot.register_next_step_handler(msg, nickname)
         
 def nickname(message):
@@ -81,7 +81,7 @@ def nickname(message):
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Город: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "5. Ваш никнейм в телеграме (например @username)", reply_markup = markup_appeal)
+        msg = bot.send_message(message.chat.id, "6. Ваш никнейм в телеграме (например @username)", reply_markup = markup_appeal)
         bot.register_next_step_handler(msg, image)
 
 def image(message):
@@ -90,7 +90,7 @@ def image(message):
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Никнейм: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "6. Фото", reply_markup = markup_appeal)
+        msg = bot.send_message(message.chat.id, "7. Фото", reply_markup = markup_appeal)
         log.close()
         bot.register_next_step_handler(msg, finishing)
 
