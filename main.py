@@ -78,7 +78,7 @@ def price(message):
         else:
             msg = bot.send_message(message.chat.id, "3. Цена услуги", reply_markup = markup_appeal)
         log.write("Описание: " + message.text + "\n")
-        if message.text == "Создать новый товар":
+        if isItItem:
             bot.register_next_step_handler(msg, delivery)
         else:
             bot.register_next_step_handler(msg, city)
@@ -146,7 +146,11 @@ def finishing(message):
             msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markup_appeal)
             bot.register_next_step_handler(msg, finishing)
         try:
-            bot.send_photo(nextAdmin, message.photo[1].file_id, appeal)
+            if message.text == "Пропустить":
+                bot.send_message(nextAdmin, appeal)
+            else:
+                bot.send_photo(nextAdmin , message.photo[1].file_id,appeal)
+            
         except Exception as e:
             print("blya")
             print(e)
