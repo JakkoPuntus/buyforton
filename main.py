@@ -124,16 +124,16 @@ bot.load_next_step_handlers()
 
 @bot.message_handler(regexp = "Написать в техподдержку")
 def support_first(message):
-    msg = bot.send_message(message.chat.id, "Задайте свой вопрос модераторам")
+    msg = bot.send_message(message.chat.id, "Задайте свой вопрос модераторам", reply_markup = markup_appeal)
     bot.register_next_step_handler(msg, support)
 
 def support(message):
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "отменено", reply_markup = markup)
     else:
         bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
         bot.forward_message(nextAdmin, message.chat.id, message.message_id)
-        bot.send_message(message.chat.id, "Ваше обращение принято, мы вам ответим")
+        bot.send_message(message.chat.id, "Ваше обращение принято, мы вам ответим", reply_markup = markup)
 
 @bot.message_handler(regexp = "Поддержать проект")
 def donate(message):
