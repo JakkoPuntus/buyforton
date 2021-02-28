@@ -8,6 +8,7 @@ bot = telebot.TeleBot(TOKEN, num_threads = 4)
 
 markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 markup_appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+markup_photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 
 mkp_newproduct = telebot.types.KeyboardButton('Создать новый товар')
 mkp_support = telebot.types.KeyboardButton('Написать в техподдержку')
@@ -19,7 +20,7 @@ mkp_vip = telebot.types.KeyboardButton('Купить VIP 💎')
 markup.row(mkp_newproduct, mkp_support)
 markup.row(mkp_donate)
 markup_appeal.row(mkp_cancel)
-
+markup_photo.row(mkp_cancel, mkp_skip)
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -30,83 +31,115 @@ def ban_user(message):
     bot.kick_chat_member(message.chat.id, message.chat.id)
 
 @bot.message_handler(regexp = "Создать новый товар")
-def name(message):
+@bot.message_handler(regexp = "Создать новую услугу")
+def def_name(message):
     global log
     global name
+    global isItItem
     name = str(message.chat.id) + ".txt"
     try:
         log = open(name, "x", encoding = "utf-8")
     except:
         log = open(name, "r+", encoding = "utf-8")
     bot.send_message(message.chat.id, "Пожалуйста введите:", reply_markup = markup_appeal)
-    msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = markup_appeal)
+    if message.text == "Создать новый товар":
+        msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = markup_appeal)
+        isItItem = True
+        log.write("#товар \n")
+    else:
+        msg = bot.send_message(message.chat.id, "1. Название услуги", reply_markup = markup_appeal)
+        isItItem = False
+        log.write("#услуга \n")
+
     bot.register_next_step_handler(msg, description)
 
 def description(message):
     global log
+    global isItItem
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
+        if isItItem:
+            msg = bot.send_message(message.chat.id, "2. Описание  товара", reply_markup = markup_appeal)
+        else:
+            msg = bot.send_message(message.chat.id, "2. Описание  услуги", reply_markup = markup_appeal)
         log.write("Название: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "2. Описание  товара", reply_markup = markup_appeal)
         bot.register_next_step_handler(msg, price)
 
 def price(message):
     global log
+    global isItItem
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
+        if isItItem:
+            msg = bot.send_message(message.chat.id, "3. Цена товара", reply_markup = markup_appeal)
+        else:
+            msg = bot.send_message(message.chat.id, "3. Цена услуги", reply_markup = markup_appeal)
         log.write("Описание: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "3. Цена товара", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, delivery)
+        if message.text == "Создать новый товар":
+            bot.register_next_step_handler(msg, delivery)
+        else:
+            bot.register_next_step_handler(msg, city)
 
 def delivery(message):
     global log
+    global isItItem
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Цена: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "4.Доставка по РБ (цена и условия)", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, nickname)
+        bot.register_next_step_handler(msg, seller)
 
 def city(message):
     global log
+    
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Цена: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "5. Ваш город", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, nickname)
+        msg = bot.send_message(message.chat.id, "4. Ваш город", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, seller)
         
-def nickname(message):
+def seller(message):
     global log
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
-        log.write("Доставка: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "6. Ваш никнейм в телеграме (например @username)", reply_markup = markup_appeal)
+        if isItItem:
+            log.write("Доставка: " + message.text + "\n")
+        else:
+            log.write("Город: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "5. Ваш никнейм в телеграме (в формате @username)", reply_markup = markup_appeal)
         bot.register_next_step_handler(msg, image)
 
 def image(message):
     global log
+    global isItItem
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
-        log.write("Никнейм: " + message.text + "\n")
-        msg = bot.send_message(message.chat.id, "7. Фото", reply_markup = markup_appeal)
+        log.write("Продавец: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "6. Фото", reply_markup = markup_photo)
         log.close()
         bot.register_next_step_handler(msg, finishing)
 
 def finishing(message):
     global log
     global name
-    loger = open(name, "r", encoding = "utf-8")
-    appeal = loger.read()
+   
+    
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
+        loger = open(name, "r", encoding = "utf-8")
+        appeal = loger.read()
         try:
-            bot.send_photo(ADMIN_ID, message.photo[1].file_id,appeal)
+            if message.text == "Пропустить":
+                bot.send_message(ADMIN_ID, appeal)
+            else:
+                bot.send_photo(ADMIN_ID, message.photo[1].file_id,appeal)
             bot.send_message(message.chat.id, "Заявка отправлена на модерацию", reply_markup=markup)
         except:
             msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markup_appeal)
@@ -116,6 +149,8 @@ def finishing(message):
         except Exception as e:
             print("blya")
             print(e)
+
+            
 
 
 
