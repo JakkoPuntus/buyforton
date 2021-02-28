@@ -62,7 +62,7 @@ def delivery(message):
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
-        log.write("Описание: " + message.text + "\n")
+        log.write("Цена: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "4.Доставка по РБ (цена и условия)", reply_markup = markup_appeal)
         bot.register_next_step_handler(msg, nickname)
 
@@ -80,7 +80,7 @@ def nickname(message):
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
-        log.write("Город: " + message.text + "\n")
+        log.write("Доставка: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "6. Ваш никнейм в телеграме (например @username)", reply_markup = markup_appeal)
         bot.register_next_step_handler(msg, image)
 
