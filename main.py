@@ -57,7 +57,7 @@ def description(message):
     global log
     global isItItem
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         if isItItem:
             msg = bot.send_message(message.chat.id, "2. Описание  товара", reply_markup = markup_appeal)
@@ -70,7 +70,7 @@ def price(message):
     global log
     global isItItem
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         if isItItem:
             msg = bot.send_message(message.chat.id, "3. Цена товара", reply_markup = markup_appeal)
@@ -86,7 +86,7 @@ def delivery(message):
     global log
     global isItItem
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         log.write("Цена: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "4.Доставка по РБ (цена и условия)", reply_markup = markup_appeal)
@@ -96,7 +96,7 @@ def city(message):
     global log
     
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         log.write("Цена: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "4. Ваш город", reply_markup = markup_appeal)
@@ -105,7 +105,7 @@ def city(message):
 def seller(message):
     global log
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         if isItItem:
             log.write("Доставка: " + message.text + "\n")
@@ -118,7 +118,7 @@ def image(message):
     global log
     global isItItem
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         log.write("Продавец: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "6. Фото", reply_markup = markup_photo)
@@ -131,7 +131,7 @@ def finishing(message):
    
     
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+        bot.send_message(message.chat.id, "Отменено", reply_markup = markup)
     else:
         loger = open(name, "r", encoding = "utf-8")
         appeal = loger.read()
