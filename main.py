@@ -11,14 +11,15 @@ markup_appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 markup_photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 
 mkp_newproduct = telebot.types.KeyboardButton('Создать новый товар')
+mkp_newservice = telebot.types.KeyboardButton('Создать новую услугу')
 mkp_support = telebot.types.KeyboardButton('Написать в техподдержку')
 mkp_donate = telebot.types.KeyboardButton('Поддержать проект')
 mkp_cancel = telebot.types.KeyboardButton('Отменить')
 mkp_skip = telebot.types.KeyboardButton('Пропустить')
 mkp_vip = telebot.types.KeyboardButton('Купить VIP 💎')
 
-markup.row(mkp_newproduct, mkp_support)
-markup.row(mkp_donate)
+markup.row(mkp_newproduct, mkp_newservice)
+markup.row(mkp_donate, mkp_support)
 markup_appeal.row(mkp_cancel)
 markup_photo.row(mkp_cancel, mkp_skip)
 
