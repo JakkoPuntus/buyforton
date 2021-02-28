@@ -1,3 +1,6 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import telebot
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, form
 
@@ -156,4 +159,7 @@ def repeat_all_messages(message):
 
 
 if __name__ == "__main__":
-    bot.infinity_polling(none_stop = True)
+    try: 
+        bot.polling(none_stop=True, interval=0)
+    except Exception as e:
+        pass
