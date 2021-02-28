@@ -27,7 +27,7 @@ def ban_user(message):
     bot.kick_chat_member(message.chat.id, message.chat.id)
 
 @bot.message_handler(regexp = "Создать новый товар")
-def first_step(message):
+def name(message):
     global log
     global name
     name = str(message.chat.id) + ".txt"
@@ -37,45 +37,54 @@ def first_step(message):
         log = open(name, "r+", encoding = "utf-8")
     bot.send_message(message.chat.id, "Пожалуйста введите:", reply_markup = markup_appeal)
     msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = markup_appeal)
-    bot.register_next_step_handler(msg, second_step)
+    bot.register_next_step_handler(msg, description)
 
-def second_step(message):
+def description(message):
     global log
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Название: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "2. Описание  товара", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, third_step)
+        bot.register_next_step_handler(msg, price)
 
-def third_step(message):
+def price(message):
     global log
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Описание: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "3. Цена товара", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, fourth_step)
+        bot.register_next_step_handler(msg, delivery)
 
-def fourth_step(message):
+def delivery(message):
+    global log
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
+    else:
+        log.write("Описание: " + message.text + "\n")
+        msg = bot.send_message(message.chat.id, "4. Цена Доставка", reply_markup = markup_appeal)
+        bot.register_next_step_handler(msg, city)
+
+def city(message):
     global log
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Цена: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "4. Ваш город", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, fifth_step)
+        bot.register_next_step_handler(msg, nickname)
         
-def fifth_step(message):
+def nickname(message):
     global log
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
     else:
         log.write("Город: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "5. Ваш никнейм в телеграме (например @username)", reply_markup = markup_appeal)
-        bot.register_next_step_handler(msg, sixth_step)
+        bot.register_next_step_handler(msg, image)
 
-def sixth_step(message):
+def image(message):
     global log
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Создание товара отменено", reply_markup = markup)
@@ -83,9 +92,9 @@ def sixth_step(message):
         log.write("Никнейм: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "6. Фото", reply_markup = markup_appeal)
         log.close()
-        bot.register_next_step_handler(msg, seventh_step)
+        bot.register_next_step_handler(msg, finishing)
 
-def seventh_step(message):
+def finishing(message):
     global log
     global name
     loger = open(name, "r", encoding = "utf-8")
@@ -98,14 +107,13 @@ def seventh_step(message):
             bot.send_message(message.chat.id, "Заявка отправлена на модерацию", reply_markup=markup)
         except:
             msg = bot.send_message(message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markup_appeal)
-            bot.register_next_step_handler(msg, seventh_step)
+            bot.register_next_step_handler(msg, finishing)
         try:
             bot.send_photo(nextAdmin, message.photo[1].file_id, appeal)
         except Exception as e:
             print("blya")
             print(e)
 
-            
 
 
 bot.enable_save_next_step_handlers(delay = 2)
