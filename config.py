@@ -1,6 +1,6 @@
-TOKEN = "1453628529:AAGXPfrDPvsfHdywv65OqyDmoZiad-mSZng"
-ADMIN_ID = 564941525
-nextAdmin = 954657975
+TOKEN = "Token"
+ADMIN_ID = 123
+nextAdmin = 345
 
 hello_file = open("hello.txt", encoding = "utf-8")
 hello_text = hello_file.read()
