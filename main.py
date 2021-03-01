@@ -3,9 +3,11 @@
 
 import telebot
 import markups
+import regexps
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS
 
 bot = telebot.TeleBot(TOKEN, num_threads = 4)
+
 
 
 
@@ -17,8 +19,8 @@ def send_welcome(message):
 def ban_user(message):
     bot.kick_chat_member(message.chat.id, message.chat.id)
 
-@bot.message_handler(regexp = "Создать новый товар")
-@bot.message_handler(regexp = "Создать новую услугу")
+@bot.message_handler(regexp = regexps.newproduct)
+@bot.message_handler(regexp = regexps.newservice)
 def def_name(message):
     global log
     global name
@@ -29,7 +31,7 @@ def def_name(message):
     except:
         log = open(name, "r+", encoding = "utf-8")
     bot.send_message(message.chat.id, "Пожалуйста введите:", reply_markup = markups.appeal)
-    if message.text == "Создать новый товар":
+    if message.text == regexps.newproduct:
         msg = bot.send_message(message.chat.id, "1. Название товара", reply_markup = markups.appeal)
         isItItem = True
         log.write("#товар \n")
@@ -43,7 +45,7 @@ def def_name(message):
 def description(message):
     global log
     global isItItem
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         if isItItem:
@@ -56,7 +58,7 @@ def description(message):
 def price(message):
     global log
     global isItItem
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         if isItItem:
@@ -72,7 +74,7 @@ def price(message):
 def delivery(message):
     global log
     global isItItem
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         log.write("Цена: " + message.text + "\n")
@@ -82,7 +84,7 @@ def delivery(message):
 def city(message):
     global log
     
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         log.write("Цена: " + message.text + "\n")
@@ -91,7 +93,7 @@ def city(message):
         
 def seller(message):
     global log
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         if isItItem:
@@ -104,7 +106,7 @@ def seller(message):
 def image(message):
     global log
     global isItItem
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         log.write("Продавец: " + message.text + "\n")
@@ -117,7 +119,7 @@ def finishing(message):
     global name
    
     
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup = markups.main)
     else:
         loger = open(name, "r", encoding = "utf-8")
@@ -148,25 +150,25 @@ def finishing(message):
 bot.enable_save_next_step_handlers(delay = 2)
 bot.load_next_step_handlers()
 
-@bot.message_handler(regexp = "Написать в техподдержку")
+@bot.message_handler(regexp = regexps.support)
 def support_first(message):
     msg = bot.send_message(message.chat.id, "Задайте свой вопрос модераторам", reply_markup = markups.appeal)
     bot.register_next_step_handler(msg, support)
 
 def support(message):
-    if message.text == "Отменить":
+    if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "отменено", reply_markup = markups.main)
     else:
         bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
         bot.forward_message(nextAdmin, message.chat.id, message.message_id)
         bot.send_message(message.chat.id, "Ваше обращение принято, мы вам ответим", reply_markup = markups.main)
 
-@bot.message_handler(regexp = "Поддержать проект")
+@bot.message_handler(regexp = regexps.donate)
 def donate(message):
     photo = open("img/qr_vip.png", "rb")
     bot.send_photo(message.chat.id, photo, "Отправьте TON по адресу: " + TON_ADRESS + " или отсканируйте QR код")
     
-@bot.message_handler(regexp = "Купить VIP 💎")
+@bot.message_handler(regexp = regexps.vip)
 def buy_vip(message):
     photo = open("img/qr_vip.png", "rb")
     bot.send_photo(message.chat.id, photo, "Чтобы приобрести VIP, отправьте n TON по адресу: " + TON_ADRESS + " или отсканируйте QR код (QR пока не тот)")
