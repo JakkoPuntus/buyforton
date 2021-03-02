@@ -4,11 +4,13 @@
 import telebot
 import markups
 import regexps
+import transaction_checker
+import pymysql.cursors
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS
 
 bot = telebot.TeleBot(TOKEN, num_threads = 4)
 
-
+connection = pymysql.connect(host = "http://sql11.freemysqlhosting.net/", user = "sql11396174", password = "Ta4k5fZeAe")
 
 
 @bot.message_handler(commands=['start', 'help'])

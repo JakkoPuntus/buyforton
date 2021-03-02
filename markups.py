@@ -17,3 +17,6 @@ main.row(newproduct, newservice)
 main.row(donate, support)
 appeal.row(cancel)
 photo.row(cancel, skip)
+
+inline = telebot.types.InlineKeyboardMarkup()
+appeal = telebot.types.InlineKeyboardButton(text = "Купить",  url = "t.me/buyforton_bot?buy = b_01")
