@@ -30,3 +30,5 @@ def check_transaction(transaction):
   # Execute the query on the transport
   result = client.execute(query)
   return result
+
+print(check_transaction("dc3509d1bba15a30e71cefb237c068bdd64d0ea0578b1769c57a84a3dd7739c3"))
