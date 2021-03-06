@@ -7,23 +7,24 @@ import regexps
 import transaction_checker
 import pymysql.cursors
 import config
-
+import withdraw
 import logging
-from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS
+from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import logging
 
 bot = telebot.TeleBot(TOKEN, num_threads=4)
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
 
     connection = pymysql.connect(
-        host="localhost",
+        host="root@localhost",
         user="root",
+        password = "8KH6Jcu00ImP",
         database="buyforton",
-        cursorclass=pymysql.cursors.DictCursor,
+        cursorclass=pymysql.cursors.DictCursor
     )
     if message.text == "/start":
         bot.send_message(message.chat.id, hello_text, reply_markup=markups.main)
@@ -46,15 +47,84 @@ def send_welcome(message):
             bot.send_message(message.chat.id, str(buy_id), reply_markup=markups.buying)
             print(e)
 
+@bot.message_handler(commands=["admin"])
+def create_admin_panel(message):
+    print(message.chat.id in admins_list)
+    if message.chat.id in admins_list:
+        admin_btn = telebot.types.KeyboardButton("Панель администратора")
+        markups.main.row(admin_btn)
+    bot.send_message(message.chat.id, "админ панель добавлена", reply_markup= markups.main)
+
+@bot.message_handler(regexp="Панель администратора")
+def admin_panel(message):
+    if message.chat.id in admins_list:
+        bot.send_message(message.chat.id, "ну не сделал еще, чего бубнить-то?")
+    else:
+        bot.send_message(message.chat.id, "Пшел вон, шавка, не админ ты!")
 
 @bot.message_handler(commands=["ban"])
 def ban_user(message):
     bot.kick_chat_member(message.chat.id, message.chat.id)
 
+@bot.message_handler(commands=["accept"])
+def acception(message):
+    inline = message.reply_to_message.reply_markup
+    new_channel = None
+    if message.text.find("!") != -1:
+        index = message.text.index("!")+1
+        new_category = message.text[index:]
+        new_category = new_category.replace(" ", "")
+        
+
+    try:
+        channel_to_send = "dmth"
+        if message.reply_to_message.text != None:
+            for i in message.reply_to_message.text.split("\n"):
+                if "Категория:" in i:
+                    channel_to_send = i
+                    print(channel_to_send)
+        elif message.reply_to_message.caption != None:
+            for i in message.reply_to_message.caption.split("\n"):
+                if "Категория:" in i:
+                    channel_to_send = i
+        if message.text.find('!') != -1:
+            index = message.text.index("!")+1
+            new_channel = message.text[index:]
+            new_channel = new_channel.replace(" ", "")
+            
+            try:
+                a = "Категория: " + message.reply_to_message.text.replace(channel_to_send, config.commands[new_channel])
+                print(a)
+                bot.edit_message_text(
+                    a,
+                    message.chat.id,
+                    message.reply_to_message.id,
+                    reply_markup = inline
+                )
+            except:
+                a = message.reply_to_message.caption.replace(channel_to_send, config.commands[new_channel])
+                
+                print(a)
+                bot.edit_message_caption(
+                    a,
+                    message.chat.id,
+                    message.reply_to_message.id,
+                    reply_markup = inline
+                )
+        channel_to_send = channel_to_send.replace('Категория: ', '')
+        if new_channel != None:
+            channel_to_send = config.commands[new_channel]
+            channel_to_send = channel_to_send.replace('Категория: ', '')
+        print(channel_to_send)
+        print(config.categories[channel_to_send])
+        bot.forward_message(config.categories[channel_to_send], message.chat.id, message.reply_to_message.id)
+    except Exception as e:
+        print(e)
+
 
 @bot.message_handler(regexp=regexps.newproduct)
 @bot.message_handler(regexp=regexps.newservice)
-def def_name(message):
+def def_category(message):
     global log
     global name
     global isItItem
@@ -63,23 +133,42 @@ def def_name(message):
         log = open(name, "x", encoding="utf-8")
     except:
         log = open(name, "r+", encoding="utf-8")
-    bot.send_message(
-        message.chat.id, "Пожалуйста введите:", reply_markup=markups.appeal
-    )
+    
     if message.text == regexps.newproduct:
         msg = bot.send_message(
-            message.chat.id, "1. Название товара", reply_markup=markups.appeal
+        message.chat.id, "Пожалуйста, выберите категорию товара",
+        reply_markup = markups.categories
         )
         isItItem = True
         log.write("#товар \n")
     else:
         msg = bot.send_message(
-            message.chat.id, "1. Название услуги", reply_markup=markups.appeal
+            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories
         )
         isItItem = False
         log.write("#услуга \n")
-    bot.register_next_step_handler(msg, description)
+    bot.register_next_step_handler(msg, def_name)
 
+def def_name(message):
+    global log
+    global name
+    global isItItem
+    try:
+        if message.text in config.categories:
+            msg = bot.send_message(
+                message.chat.id, "1. Название товара", reply_markup=markups.appeal
+            )
+            isItItem = True
+            log.write("Категория: " + message.text + "\n")
+        else:
+            msg = bot.send_message(
+                message.chat.id, "1. Название услуги", reply_markup=markups.appeal
+            )
+            isItItem = False
+            log.write("Категория: " + message.text + "\n")
+    except Exception as e:
+        print(e)
+    bot.register_next_step_handler(msg, description)
 
 def description(message):
     global log
@@ -99,10 +188,9 @@ def description(message):
                 message.chat.id, "2. Описание  услуги", reply_markup=markups.appeal
             )
         log.write("Название: " + message.text + "\n")
-        bot.register_next_step_handler(msg, price)
+        bot.register_next_step_handler(msg, def_price)
 
-
-def price(message):
+def def_price(message):
     global log
     global isItItem
     if message.text == regexps.cancel:
@@ -126,7 +214,6 @@ def price(message):
         else:
             bot.register_next_step_handler(msg, city)
 
-
 def delivery(message):
     global log
     global isItItem
@@ -143,7 +230,6 @@ def delivery(message):
         )
         bot.register_next_step_handler(msg, seller)
 
-
 def city(message):
     global log
 
@@ -155,7 +241,6 @@ def city(message):
             message.chat.id, "4. Ваш город", reply_markup=markups.appeal
         )
         bot.register_next_step_handler(msg, seller)
-
 
 def seller(message):
     global log
@@ -171,8 +256,20 @@ def seller(message):
             "5. Ваш никнейм в телеграме (в формате @username)",
             reply_markup=markups.appeal,
         )
-        bot.register_next_step_handler(msg, image)
+        bot.register_next_step_handler(msg, TON_wallet)
 
+def TON_wallet(message):
+    global log
+    if message.text == regexps.cancel:
+        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+    else:
+        log.write("Продавец: " + message.text + "\n")
+        msg = bot.send_message(
+            message.chat.id,
+            "6. Адрес вашего TON кошелька",
+            reply_markup=markups.appeal,
+        )
+        bot.register_next_step_handler(msg, image)
 
 def image(message):
     global log
@@ -180,13 +277,12 @@ def image(message):
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
-        log.write("Продавец: " + message.text + "\n")
         msg = bot.send_message(message.chat.id, "6. Фото", reply_markup=markups.photo)
         log.close()
-        bot.register_next_step_handler(msg, finishing)
+        bot.register_next_step_handler(msg, finishing, wallet = message.text)
 
 
-def finishing(message):
+def finishing(message, wallet):
     global log
     global price
 
@@ -228,16 +324,17 @@ def finishing(message):
         print
 
         connection = pymysql.connect(
-            host="localhost",
+            host="root@localhost",
             user="root",
+            password = "8KH6Jcu00ImP",
             database="buyforton",
-            cursorclass=pymysql.cursors.DictCursor,
+            cursorclass=pymysql.cursors.DictCursor
         )
 
         with connection:
             with connection.cursor() as cursor:
                 # Create a new record
-                sql = "INSERT INTO `buyforton_appeals` (`message_id`, `nickname`, `chat_id`, `price`, `name`) VALUES (%s, %s, %s, %s, %s)"
+                sql = "INSERT INTO `buyforton_appeals` (`message_id`, `nickname`, `chat_id`, `price`, `name`, `wallet`) VALUES (%s, %s, %s, %s, %s, %s)"
                 cursor.execute(
                     sql,
                     (
@@ -246,7 +343,8 @@ def finishing(message):
                         message.chat.id,
                         price,
                         itemName,
-                    ),
+                        wallet
+                    )
                 )
             connection.commit()
 
@@ -297,10 +395,11 @@ def buy_vip(message):
 @bot.message_handler(regexp=regexps.shopcart)
 def shopcart(message):
     connection = pymysql.connect(
-        host="localhost",
+        host="root@localhost",
         user="root",
+        password = "8KH6Jcu00ImP",
         database="buyforton",
-        cursorclass=pymysql.cursors.DictCursor,
+        cursorclass=pymysql.cursors.DictCursor
     )
     with connection:
         with connection.cursor() as cursor:
@@ -335,10 +434,11 @@ def shopcart(message):
 @bot.callback_query_handler(func=lambda c: c.data.find("order") != -1)
 def show_order(c):
     connection = pymysql.connect(
-        host="localhost",
+        host="root@localhost",
         user="root",
+        password = "8KH6Jcu00ImP",
         database="buyforton",
-        cursorclass=pymysql.cursors.DictCursor,
+        cursorclass=pymysql.cursors.DictCursor
     )
     buy_id = c.data
     buy_id = buy_id.replace("order", "")
@@ -350,16 +450,55 @@ def show_order(c):
             )
             cursor.execute(sql, (buy_id))
             result = cursor.fetchone()
-    print(buy_id)
-    print(result)
+
+    order = telebot.types.InlineKeyboardMarkup()
+    confirm = telebot.types.InlineKeyboardButton("Подтвердить получение заказа", callback_data="confirm" + str(buy_id))
+    order.row(confirm)
+    order.row(markups.back)
     bot.edit_message_text(
         "ЗАКАЗ " + str(result["name"]) + " ценой " + str(result["price"]) + " TON",
         c.message.chat.id,
         c.message.id,
-        reply_markup = markups.order
+        reply_markup = order
     )
     print(result)
 
+@bot.callback_query_handler(func=lambda c: c.data.find("confirm") != -1)
+def send_money(c):
+    bot.send_message(c.message.chat.id, "Деньги скоро будут отправлены продавцу. Спасибо, что пользуетесь BUYFORTON")
+    connection = pymysql.connect(
+        host="root@localhost",
+        user="root",
+        password = "8KH6Jcu00ImP",
+        database="buyforton",
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    buy_id = c.data.replace('confirm', '')
+    with connection:
+        with connection.cursor() as cursor:
+            # Read a single record
+            sql = (
+                "SELECT `wallet`, `price` FROM `buyforton_appeals` WHERE `message_id`=%s"
+            )
+            cursor.execute(sql, (buy_id))
+            result = cursor.fetchone()
+        with connection.cursor() as cursor:
+            # Read a single record
+            sql = (
+                "DELETE FROM `buyforton`.`buyforton_appeals` WHERE `buyforton_appeals`.`message_id` = %s"
+            )
+            cursor.execute(sql, (buy_id))
+        with connection.cursor() as cursor:
+            # Read a single record
+            sql = (
+                "DELETE FROM `shopwheels`.`buyforton_appeals` WHERE `shopwheels`.`message_id` = %s"
+            )
+            cursor.execute(sql, (buy_id))
+        connection.commit()
+        
+    
+    bot.send_message(c.message.chat.id, result['wallet'] + " " + str(result['price']) )
+    withdraw.send_ton(result['wallet'], result['price'])
 
 @bot.message_handler(content_types=["text"])
 def repeat_all_messages(message):
@@ -371,10 +510,11 @@ def repeat_all_messages(message):
         global price
         buy_id = int(message.text.replace("Оплатить ", ""))
         connection = pymysql.connect(
-            host="localhost",
-            user="root",
-            database="buyforton",
-            cursorclass=pymysql.cursors.DictCursor,
+        host="root@localhost",
+        user="root",
+        password = "8KH6Jcu00ImP",
+        database="buyforton",
+        cursorclass=pymysql.cursors.DictCursor
         )
         with connection:
             with connection.cursor() as cursor:
@@ -422,10 +562,11 @@ def confirmation_second(message):
     bot.send_message(message.chat.id, "Транзакция проверяется...")
 
     connection = pymysql.connect(
-        host="localhost",
+        host="root@localhost",
         user="root",
+        password = "8KH6Jcu00ImP",
         database="buyforton",
-        cursorclass=pymysql.cursors.DictCursor,
+        cursorclass=pymysql.cursors.DictCursor
     )
 
     tr_chk = transaction_checker.check_transaction(message.text)
@@ -446,10 +587,7 @@ def confirmation_second(message):
                 sql = "SELECT `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
                 cursor.execute(sql, (buy_id))
                 result = cursor.fetchone()
-            with connection.cursor() as cursor:
-                # Create a new record
-                sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
-                cursor.execute(sql, (buy_id, message.from_user.id, result["chat_id"]))
+            
 
                 # connection is not autocommit by default. So you must commit to save
                 # your changes.

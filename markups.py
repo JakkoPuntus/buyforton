@@ -6,7 +6,7 @@ appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 transaction = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
-order = telebot.types.InlineKeyboardMarkup()
+
 
 newproduct = telebot.types.KeyboardButton(regexps.newproduct)
 newservice = telebot.types.KeyboardButton(regexps.newservice)
@@ -25,5 +25,23 @@ main.row(shopcart)
 appeal.row(cancel)
 photo.row(cancel, skip)
 transaction.row(cancel, confirm)
-order.row(back)
 
+#categories
+general = telebot.types.KeyboardButton("🛍🛒Общая")
+hand_made =  telebot.types.KeyboardButton('🧶🧵🎨 Хэнд-мейд')
+souvenirs = telebot.types.KeyboardButton('🏆🏺🎁 Сувениры ')
+food = telebot.types.KeyboardButton('🍰🍒🍗 Продукты питания ')
+pets = telebot.types.KeyboardButton('🐶🐱Домашние питомцы')
+digital = telebot.types.KeyboardButton('📲Цифровые товары')
+tech = telebot.types.KeyboardButton('💻 Техника')
+sport = telebot.types.KeyboardButton('⚽️🏀🏓 Товары для спорта ')
+adult = telebot.types.KeyboardButton('👙🔞👄 18+')
+holiday = telebot.types.KeyboardButton('🎁 К празднику')
+repair = telebot.types.KeyboardButton('🛠 Запчасти')
+
+categories = telebot.types.ReplyKeyboardMarkup(selective = False)
+
+categories.row(hand_made, souvenirs, food)
+categories.row(pets, holiday, digital)
+categories.row(tech, sport, repair, adult)
+categories.row(general)
