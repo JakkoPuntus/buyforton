@@ -293,7 +293,7 @@ def finishing(message, wallet):
     global log
     global price
 
-    url = "t.me/buyforton_debug_bot?start=" + str(message.message_id)
+    url = "t.me/buyforton_bot?start=" + str(message.message_id)
 
     inline = telebot.types.InlineKeyboardMarkup()
     appeal_btn = telebot.types.InlineKeyboardButton(text="Купить", url=url)
