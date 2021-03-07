@@ -537,7 +537,7 @@ def repeat_all_messages(message):
                     message.chat.id,
                     "Переведите {price} тон на следующий кошелек: ".format(price=price)
                     + TON_ADRESS
-                    + " с комментарием «kuna-a7q1pmp0ju» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
+                    + " с комментарием «kunaid-rjtihd9p6cbk» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
                     reply_markup=markups.transaction,
                 )
                 bot.register_next_step_handler(msg, confirmation)

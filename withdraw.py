@@ -15,7 +15,7 @@ def send_ton(address, amount):
         'withdrawall': True
     }
 
-    key = 'pXGToH2CFBPkDBF1sPXpG74UabUB8TEUfK98zYal'
+    key = '6hhZZ6vAzkxy8qHX4I86HxMzvueyaxqf9YeFWNML'
     key = key.encode('ascii')
 
     body = json.dumps(data)
@@ -31,7 +31,7 @@ def send_ton(address, amount):
     'accept': 'application/json',
     'content-type': 'application/json',
     'kun-nonce': nonce,
-    'kun-apikey': 'qBvJaMi0QcLmxMX5wiab2kuJxFSOi2cU8LvxTVZn',
+    'kun-apikey': 'iM2VXOVjIeTLuQAQ3u1vxcxxVprAQRKK06uj0kxx',
     'kun-signature': signature
     }
     
