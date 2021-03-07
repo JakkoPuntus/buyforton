@@ -379,7 +379,7 @@ def donate(message):
     bot.send_photo(
         message.chat.id,
         photo,
-        "Отправьте TON по адресу: " + TON_ADRESS + " или отсканируйте QR код",
+        "Отправьте TON по адресу: 0:d013df48b33ff5479357b651499846eda4db2a3bac3d1926def3693403192d59 или отсканируйте QR код",
     )
 
 
