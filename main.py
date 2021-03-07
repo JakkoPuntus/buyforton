@@ -20,7 +20,7 @@ bot = telebot.TeleBot(TOKEN, num_threads=4)
 def send_welcome(message):
 
     connection = pymysql.connect(
-        host="root@localhost",
+        host="localhost",
         user="root",
         password = "8KH6Jcu00ImP",
         database="buyforton",
@@ -324,7 +324,7 @@ def finishing(message, wallet):
         print
 
         connection = pymysql.connect(
-            host="root@localhost",
+            host="localhost",
             user="root",
             password = "8KH6Jcu00ImP",
             database="buyforton",
@@ -395,7 +395,7 @@ def buy_vip(message):
 @bot.message_handler(regexp=regexps.shopcart)
 def shopcart(message):
     connection = pymysql.connect(
-        host="root@localhost",
+        host="localhost",
         user="root",
         password = "8KH6Jcu00ImP",
         database="buyforton",
@@ -434,7 +434,7 @@ def shopcart(message):
 @bot.callback_query_handler(func=lambda c: c.data.find("order") != -1)
 def show_order(c):
     connection = pymysql.connect(
-        host="root@localhost",
+        host="localhost",
         user="root",
         password = "8KH6Jcu00ImP",
         database="buyforton",
@@ -467,7 +467,7 @@ def show_order(c):
 def send_money(c):
     bot.send_message(c.message.chat.id, "Деньги скоро будут отправлены продавцу. Спасибо, что пользуетесь BUYFORTON")
     connection = pymysql.connect(
-        host="root@localhost",
+        host="localhost",
         user="root",
         password = "8KH6Jcu00ImP",
         database="buyforton",
@@ -510,7 +510,7 @@ def repeat_all_messages(message):
         global price
         buy_id = int(message.text.replace("Оплатить ", ""))
         connection = pymysql.connect(
-        host="root@localhost",
+        host="localhost",
         user="root",
         password = "8KH6Jcu00ImP",
         database="buyforton",
@@ -562,7 +562,7 @@ def confirmation_second(message):
     bot.send_message(message.chat.id, "Транзакция проверяется...")
 
     connection = pymysql.connect(
-        host="root@localhost",
+        host="localhost",
         user="root",
         password = "8KH6Jcu00ImP",
         database="buyforton",
