@@ -118,7 +118,7 @@ def acception(message):
                 channel_to_send = channel_to_send.replace('Категория: ', '')
             print(channel_to_send)
             print(config.categories[channel_to_send])
-            bot.forward_message(config.categories[channel_to_send], message.chat.id, message.reply_to_message.id)
+            bot.send_message(config.categories[channel_to_send], message.reply_to_message.text, reply_markup = inline)
         except Exception as e:
             print(e)
     else:
