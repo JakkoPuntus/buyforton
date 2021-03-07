@@ -18,6 +18,7 @@ bot = telebot.TeleBot(TOKEN, num_threads=4)
 
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
+    buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
 
     connection = pymysql.connect(
         host="localhost",
@@ -41,10 +42,10 @@ def send_welcome(message):
             buy_message = "Вы выбрали товар №{res} \n Перед тем, как оплатить его, обязательно свяжитесь с продавцом @{nickname} и договоритесь об условиях доставки. \n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
                 res=buy_id, nickname=result["nickname"]
             )
-            markups.buying.row("Оплатить " + str(buy_id))
-            bot.send_message(message.chat.id, buy_message, reply_markup=markups.buying)
+            buying.row("Оплатить " + str(buy_id))
+            bot.send_message(message.chat.id, buy_message, reply_markup=buying)
         except Exception as e:
-            bot.send_message(message.chat.id, str(buy_id), reply_markup=markups.buying)
+            bot.send_message(message.chat.id, str(buy_id), reply_markup=buying)
             print(e)
 
 @bot.message_handler(commands=["admin"])
@@ -514,6 +515,7 @@ def repeat_all_messages(message):
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
+        
         if message.text.find("Оплатить") != -1:
             global buy_id
             global price
