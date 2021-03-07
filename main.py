@@ -10,7 +10,7 @@ import config
 import withdraw
 import logging
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
-import logging
+import os
 
 bot = telebot.TeleBot(TOKEN, num_threads=4)
 #logging.basicConfig(level=logging.DEBUG)
@@ -354,6 +354,7 @@ def finishing(message, wallet):
                     )
                 )
             connection.commit()
+    os.remove(name)
 
 
 @bot.message_handler(regexp=regexps.support)
@@ -620,3 +621,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         pass
+
+
+#for git
