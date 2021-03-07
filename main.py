@@ -118,6 +118,7 @@ def acception(message):
                 channel_to_send = channel_to_send.replace('Категория: ', '')
             print(channel_to_send)
             print(config.categories[channel_to_send])
+            print()
             try:
                 bot.send_message(config.categories[channel_to_send], message.reply_to_message.text, reply_markup = inline)
             except:
@@ -322,9 +323,9 @@ def finishing(message, wallet):
             bot.register_next_step_handler(msg, finishing)
         try:
             if message.text == "Пропустить":
-                bot.send_message(nextAdmin, appeal)
+                bot.send_message(nextAdmin, appeal, reply_markup=inline)
             else:
-                bot.send_photo(nextAdmin, message.photo[1].file_id, appeal)
+                bot.send_photo(nextAdmin, message.photo[1].file_id, appeal, reply_markup=inline)
         except Exception as e:
             print(e)
         print
