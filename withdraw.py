@@ -39,3 +39,5 @@ def send_ton(address, amount):
     logging.basicConfig(level=logging.DEBUG)
     response = requests.post('https://api.kuna.io/v3/auth/withdraw', headers=headers, data=body)
     return response
+
+print(send_ton("s", -1).text)
