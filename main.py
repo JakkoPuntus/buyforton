@@ -118,7 +118,10 @@ def acception(message):
                 channel_to_send = channel_to_send.replace('Категория: ', '')
             print(channel_to_send)
             print(config.categories[channel_to_send])
-            bot.send_message(config.categories[channel_to_send], message.reply_to_message.text, reply_markup = inline)
+            try:
+                bot.send_message(config.categories[channel_to_send], message.reply_to_message.text, reply_markup = inline)
+            except:
+                bot.send_photo(config.categories[channel_to_send], message.reply_to_message.photo[1], message.reply_to_message.text, reply_markup = inline)
         except Exception as e:
             print(e)
     else:
