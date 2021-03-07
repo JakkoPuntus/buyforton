@@ -513,53 +513,57 @@ def repeat_all_messages(message):
 
     if message.text == "Отменить":
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
-    if message.text.find("Оплатить") != -1:
-        global buy_id
-        global price
-        buy_id = int(message.text.replace("Оплатить ", ""))
-        connection = pymysql.connect(
-        host="localhost",
-        user="root",
-        password = "8KH6Jcu00ImP",
-        database="buyforton",
-        cursorclass=pymysql.cursors.DictCursor
-        )
-        with connection:
-            with connection.cursor() as cursor:
-                # Read a single record
-                sql = "SELECT `price` FROM `buyforton_appeals` WHERE `message_id`=%s"
-                cursor.execute(sql, (buy_id))
-                result = cursor.fetchone()
-            price = result["price"]
+    else:
+        if message.text.find("Оплатить") != -1:
+            global buy_id
+            global price
+            buy_id = int(message.text.replace("Оплатить ", ""))
+            connection = pymysql.connect(
+            host="localhost",
+            user="root",
+            password = "8KH6Jcu00ImP",
+            database="buyforton",
+            cursorclass=pymysql.cursors.DictCursor
+            )
+            with connection:
+                with connection.cursor() as cursor:
+                    # Read a single record
+                    sql = "SELECT `price` FROM `buyforton_appeals` WHERE `message_id`=%s"
+                    cursor.execute(sql, (buy_id))
+                    result = cursor.fetchone()
+                price = result["price"]
 
-            msg = bot.send_message(
-                message.chat.id,
-                "Переведите {price} тон на следующий кошелек: ".format(price=price)
-                + TON_ADRESS
-                + " с комментарием «kuna-a7q1pmp0ju» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
-                reply_markup=markups.transaction,
-            )
-            bot.register_next_step_handler(msg, confirmation)
-    elif message.chat.id == ADMIN_ID:
-        try:
-            bot.send_message(
-                message.reply_to_message.chat.id,
-                message.text,
-                reply_markup=markups.main,
-            )
-        except Exception as e:
-            print(e)
+                msg = bot.send_message(
+                    message.chat.id,
+                    "Переведите {price} тон на следующий кошелек: ".format(price=price)
+                    + TON_ADRESS
+                    + " с комментарием «kuna-a7q1pmp0ju» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
+                    reply_markup=markups.transaction,
+                )
+                bot.register_next_step_handler(msg, confirmation)
+        elif message.chat.id == ADMIN_ID:
+            try:
+                bot.send_message(
+                    message.reply_to_message.chat.id,
+                    message.text,
+                    reply_markup=markups.main,
+                )
+            except Exception as e:
+                print(e)
 
 
 def confirmation(message):
-    try:
-        msg = bot.send_message(
-            message.chat.id, "Отправьте id транзакции", reply_markup=markups.transaction
-        )
-        bot.register_next_step_handler(msg, confirmation_second)
-    except Exception as e:
-        print(e)
-        bot.send_message(message.chat.id, "Something went wrong: ")
+    if message.text == "Отменить":
+        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+    else:
+        try:
+            msg = bot.send_message(
+                message.chat.id, "Отправьте id транзакции", reply_markup=markups.transaction
+            )
+            bot.register_next_step_handler(msg, confirmation_second)
+        except Exception as e:
+            print(e)
+            bot.send_message(message.chat.id, "Something went wrong: ")
 
 
 def confirmation_second(message):
