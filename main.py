@@ -213,7 +213,7 @@ def def_price(message):
         else:
             msg = bot.send_message(
                 message.chat.id,
-                "3. Цена услуги в TON (только число)",
+                "3. Цена услуги в TON (только число, минимум 2.5)",
                 reply_markup=markups.appeal,
             )
         log.write("Описание: " + message.text + "\n")
@@ -232,13 +232,17 @@ def delivery(message):
     else:
         try:
             float(price)
-            log.write("Цена: " + message.text + "\n")
-            msg = bot.send_message(
-                message.chat.id,
-                "4.Доставка по РБ (цена и условия)",
-                reply_markup=markups.appeal,
-            )
-            bot.register_next_step_handler(msg, seller)
+            if price < 2.5:
+                msg = bot.send_message(message.chat.id, "Минимум 2.5!", reply_markup=markups.appeal)
+                bot.register_next_step_handler(msg, delivery)
+            else:
+                log.write("Цена: " + message.text + "\n")
+                msg = bot.send_message(
+                    message.chat.id,
+                    "4.Доставка по РБ (цена и условия) ",
+                    reply_markup=markups.appeal,
+                )
+                bot.register_next_step_handler(msg, seller)
         except:
             msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Попробуйте ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
