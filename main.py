@@ -240,7 +240,7 @@ def delivery(message):
             )
             bot.register_next_step_handler(msg, seller)
         except:
-            msg = bot.send_message(message.chat.id, "Неверный формат", reply_markup=markups.main)
+            msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Попробуйте ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
         
 
