@@ -505,13 +505,13 @@ def send_money(c):
         with connection.cursor() as cursor:
             # Read a single record
             sql = (
-                "DELETE FROM `buyforton`.`buyforton_appeals` WHERE `buyforton_appeals`.`message_id` = %s"
+                "DELETE FROM `buyforton_appeals` WHERE message_id` = %s"
             )
             cursor.execute(sql, (buy_id))
         with connection.cursor() as cursor:
             # Read a single record
             sql = (
-                "DELETE FROM `shopwheels`.`buyforton_appeals` WHERE `shopwheels`.`message_id` = %s"
+                "DELETE FROM `shopwheels` WHERE `message_id` = %s"
             )
             cursor.execute(sql, (buy_id))
         connection.commit()
