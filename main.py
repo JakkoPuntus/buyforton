@@ -553,7 +553,7 @@ def repeat_all_messages(message):
                     message.chat.id,
                     "Переведите {price} тон на следующий кошелек: ".format(price=price)
                     + TON_ADRESS
-                    + " с комментарием «kunaid-rjtihd9p6cbk» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
+                    + " с комментарием «kuna-2gs4kaytt5» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
                     reply_markup=markups.transaction,
                 )
                 bot.register_next_step_handler(msg, confirmation)
@@ -615,15 +615,15 @@ def confirmation_second(message):
                 sql = "SELECT `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
                 cursor.execute(sql, (buy_id))
                 result = cursor.fetchone()
-            
+            with connection.cursor() as cursor:
+                sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
+                cursor.execute(sql, (buy_id, message.chat.id, result["chat_id"]))
 
-                # connection is not autocommit by default. So you must commit to save
-                # your changes.
-                connection.commit()
+            connection.commit()
         bot.send_message(
             result["chat_id"],
             "Ваш товар оплачен юзером @" + message.from_user.username,
-            reply_markup=markups.main,
+            reply_markup=markups.main
         )
         bot.send_message(
             message.chat.id, "Операция прошла успешно", reply_markup=markups.main
