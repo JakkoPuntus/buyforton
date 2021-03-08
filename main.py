@@ -232,7 +232,7 @@ def delivery(message):
     else:
         try:
             float(price)
-            if price < 2.5:
+            if price < 2:
                 msg = bot.send_message(message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, delivery)
             else:
@@ -243,9 +243,10 @@ def delivery(message):
                     reply_markup=markups.appeal,
                 )
                 bot.register_next_step_handler(msg, seller)
-        except:
+        except Exception as e:
             msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Попробуйте ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
+            print(e)
         
 
 def city(message):
