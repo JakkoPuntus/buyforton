@@ -230,13 +230,19 @@ def delivery(message):
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
-        log.write("Цена: " + message.text + "\n")
-        msg = bot.send_message(
-            message.chat.id,
-            "4.Доставка по РБ (цена и условия)",
-            reply_markup=markups.appeal,
-        )
-        bot.register_next_step_handler(msg, seller)
+        try:
+            float(price)
+            log.write("Цена: " + message.text + "\n")
+            msg = bot.send_message(
+                message.chat.id,
+                "4.Доставка по РБ (цена и условия)",
+                reply_markup=markups.appeal,
+            )
+            bot.register_next_step_handler(msg, seller)
+        except:
+            msg = bot.send_message(message.chat.id, "Неверный формат", reply_markup=markups.main)
+            bot.register_next_step_handler(msg, delivery)
+        
 
 def city(message):
     global log
@@ -507,7 +513,10 @@ def send_money(c):
         
     
     bot.send_message(c.message.chat.id, result['wallet'] + " " + str(result['price']) )
-    withdraw.send_ton(result['wallet'], result['price'])
+    if result["price"] * 0.03 < 0.5:
+        withdraw.send_ton(result['wallet'], result['price'] - 0.5)
+    else:
+        withdraw.send_ton(result['wallet'], result['price'] - result['price'] * 0.03 )
 
 @bot.message_handler(content_types=["text"])
 def repeat_all_messages(message):
