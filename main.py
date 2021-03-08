@@ -213,7 +213,7 @@ def def_price(message):
         else:
             msg = bot.send_message(
                 message.chat.id,
-                "3. Цена услуги в TON (только число, минимум 2.5)",
+                "3. Цена услуги в TON (только число, минимум 2)",
                 reply_markup=markups.appeal,
             )
         log.write("Описание: " + message.text + "\n")
@@ -233,10 +233,10 @@ def delivery(message):
         try:
             float(price)
             if price < 2.5:
-                msg = bot.send_message(message.chat.id, "Минимум 2.5!", reply_markup=markups.appeal)
+                msg = bot.send_message(message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, delivery)
             else:
-                log.write("Цена: " + message.text + "\n")
+                log.write("Цена: " + message.text + "💎\n")
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Доставка по РБ (цена и условия) ",
