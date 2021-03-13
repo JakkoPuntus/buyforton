@@ -153,7 +153,7 @@ def def_category(message):
         log.write("#товар \n")
     else:
         msg = bot.send_message(
-            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories
+            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories_service
         )
         isItItem = False
         log.write("#услуга \n")
@@ -265,6 +265,7 @@ def city(message):
 
 def seller(message):
     global log
+    global isItItem
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
@@ -277,20 +278,55 @@ def seller(message):
             "5. Ваш никнейм в телеграме (в формате @username)",
             reply_markup=markups.appeal,
         )
-        bot.register_next_step_handler(msg, TON_wallet)
+        if isItItem:
+            bot.register_next_step_handler(msg, TON_wallet)
+        else:
+            bot.register_next_step_handler(msg, guarantee)
 
-def TON_wallet(message):
-    global log
+def guarantee(message):
+
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
         log.write("Продавец: " + message.text + "\n")
         msg = bot.send_message(
             message.chat.id,
-            "6. Адрес вашего TON кошелька",
+            "6. Использовать гаранта?",
             reply_markup=markups.appeal,
         )
-        bot.register_next_step_handler(msg, image)
+        bot.register_next_step_handler(msg, TON_wallet)
+
+def TON_wallet(message):
+    global log
+    global isItItem
+    global isGuaranteed
+    if message.text == regexps.cancel:
+        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+    else:
+        bot.send_message(message.chat.id, "is it Item: " + str(isItItem))
+        if isItItem == True:
+            log.write("Продавец: " + message.text + "\n")
+            msg = bot.send_message(
+                message.chat.id,
+                "6. Адрес вашего TON кошелька",
+                reply_markup=markups.appeal,
+            )
+            bot.register_next_step_handler(msg, image)
+        else:
+            if message.text == "Нет" or message.text == "нет" :
+                isGuaranteed = False
+                msg = bot.send_message(message.chat.id, "7. Фото", reply_markup=markups.photo)
+                log.close()
+                bot.register_next_step_handler(msg, finishing, wallet = message.text)
+            else:
+                isGuaranteed = True
+                msg = bot.send_message(
+                    message.chat.id,
+                    "7. Адрес вашего TON кошелька",
+                    reply_markup=markups.appeal,
+                )
+                bot.register_next_step_handler(msg, image)
+
 
 def image(message):
     global log
@@ -298,7 +334,7 @@ def image(message):
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
-        msg = bot.send_message(message.chat.id, "6. Фото", reply_markup=markups.photo)
+        msg = bot.send_message(message.chat.id, "Фото", reply_markup=markups.photo)
         log.close()
         bot.register_next_step_handler(msg, finishing, wallet = message.text)
 
@@ -306,12 +342,16 @@ def image(message):
 def finishing(message, wallet):
     global log
     global price
+    global isGuaranteed
 
     url = "t.me/buyforton_bot?start=" + str(message.message_id)
-
-    inline = telebot.types.InlineKeyboardMarkup()
-    appeal_btn = telebot.types.InlineKeyboardButton(text="Купить", url=url)
-    inline.add(appeal_btn)
+    if isGuaranteed:
+        inline = telebot.types.InlineKeyboardMarkup()
+        appeal_btn = telebot.types.InlineKeyboardButton(text="Купить", url=url)
+        inline.add(appeal_btn)
+    else:
+        inline = None
+    
 
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)

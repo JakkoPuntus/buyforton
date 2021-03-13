@@ -39,9 +39,16 @@ adult = telebot.types.KeyboardButton('👙🔞👄 18+')
 holiday = telebot.types.KeyboardButton('🎁 К празднику')
 repair = telebot.types.KeyboardButton('🛠 Запчасти')
 
-categories = telebot.types.ReplyKeyboardMarkup(selective = False)
+pay = telebot.types.KeyboardButton('💵💎Оплата за TON')
+general_service = telebot.types.KeyboardButton('🤝Прочие услуги')
+
+
+categories = telebot.types.ReplyKeyboardMarkup(selective = False, resize_keyboard = True)
+categories_service =  telebot.types.ReplyKeyboardMarkup(selective = False, resize_keyboard = True)
 
 categories.row(hand_made, souvenirs, food)
 categories.row(pets, holiday, digital)
 categories.row(tech, sport, repair, adult)
 categories.row(general)
+
+categories_service.row(pay, general_service)
