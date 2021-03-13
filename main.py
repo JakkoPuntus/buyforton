@@ -144,6 +144,7 @@ def def_category(message):
         log = open(name, "x+", encoding="utf-8")
     except:
         log = open(name, "r+", encoding="utf-8")
+        log.truncate(0)
     
     if message.text == regexps.newproduct:
         msg = bot.send_message(
@@ -331,6 +332,7 @@ def TON_wallet(message):
                 "6. Адрес вашего TON кошелька",
                 reply_markup=markups.appeal,
             )
+            isGuaranteed = True
             bot.register_next_step_handler(msg, image)
         else:
             if message.text == "Нет" or message.text == "нет" :
