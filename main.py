@@ -142,7 +142,7 @@ def def_category(message):
     
     try:
         os.remove(name)
-        log = open(name, "x", encoding="utf-8")
+        log = open(name, "x+", encoding="utf-8")
     except:
         log = open(name, "r+", encoding="utf-8")
     
