@@ -123,7 +123,9 @@ def acception(message):
             try:
                 bot.send_message(config.categories[channel_to_send], message.reply_to_message.text, reply_markup = inline)
             except:
-                bot.send_photo(config.categories[channel_to_send], message.reply_to_message.photo[1], message.reply_to_message.text, reply_markup = inline)
+                photo = message.reply_to_message.photo[1].file_id
+                print(message.reply_to_message.text)
+                bot.send_photo(config.categories[channel_to_send], photo, message.reply_to_message.caption, reply_markup = inline)
         except Exception as e:
             print(e)
     else:
