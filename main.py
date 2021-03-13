@@ -166,7 +166,7 @@ def def_name(message):
     global name
     global isItItem
     try:
-        if message.text in config.categories:
+        if message.text in config.categories and message.text != '💵💎Оплата за TON' and message.text != '🤝Прочие услуги':
             msg = bot.send_message(
                 message.chat.id, "1. Название товара", reply_markup=markups.appeal
             )
