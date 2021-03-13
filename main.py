@@ -246,22 +246,36 @@ def delivery(message):
                 )
                 bot.register_next_step_handler(msg, seller)
         except Exception as e:
-            msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Попробуйте ещё раз.", reply_markup=markups.appeal)
+            msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
             print(e)
         
 
 def city(message):
     global log
-
+    global isItItem
+    global price
+    price = message.text
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
-        log.write("Цена: " + message.text + "\n")
-        msg = bot.send_message(
-            message.chat.id, "4. Ваш город", reply_markup=markups.appeal
-        )
-        bot.register_next_step_handler(msg, seller)
+        try:
+            float(price)
+            if float(price) < 2:
+                msg = bot.send_message(message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
+                bot.register_next_step_handler(msg, delivery)
+            else:
+                log.write("Цена: " + message.text + "💎\n")
+                msg = bot.send_message(
+                    message.chat.id,
+                    "4.Город ",
+                    reply_markup=markups.appeal,
+                )
+                bot.register_next_step_handler(msg, seller)
+        except Exception as e:
+            msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
+            bot.register_next_step_handler(msg, city)
+            print(e)
 
 def seller(message):
     global log
