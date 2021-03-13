@@ -521,7 +521,7 @@ def send_money(c):
     
     bot.send_message(c.message.chat.id, result['wallet'] + " " + str(result['price']) )
     if result["price"] * 0.03 < 0.5:
-        withdraw.send_ton(result['wallet'], result['price'] - 0.5)
+        withdraw.send_ton(result['wallet'], result['price'] - 0.4)
     else:
         withdraw.send_ton(result['wallet'], result['price'] - result['price'] * 0.03 )
 
@@ -604,36 +604,41 @@ def confirmation_second(message):
         tr_chk["transactions"][0]["out_msgs"][0]
     )
     print(tr_chk)
+    try:
+        if (
+            tr_chk["transactions"][0]["status"] == 3
+            and msg_chk["messages"][0]["dst"] == TON_ADRESS
+            and tr_chk["transactions"][0]["balance_delta"] <= config.float_to_hex(price)
+        ):
 
-    if (
-        tr_chk["transactions"][0]["status"] == 3
-        and msg_chk["messages"][0]["dst"] == TON_ADRESS
-        and tr_chk["transactions"][0]["balance_delta"] <= config.float_to_hex(price)
-    ):
+            with connection:
+                with connection.cursor() as cursor:
+                    # Read a single record
+                    sql = "SELECT `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
+                    cursor.execute(sql, (buy_id))
+                    result = cursor.fetchone()
+                with connection.cursor() as cursor:
+                    sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
+                    cursor.execute(sql, (buy_id, message.chat.id, result["chat_id"]))
 
-        with connection:
-            with connection.cursor() as cursor:
-                # Read a single record
-                sql = "SELECT `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
-                cursor.execute(sql, (buy_id))
-                result = cursor.fetchone()
-            with connection.cursor() as cursor:
-                sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
-                cursor.execute(sql, (buy_id, message.chat.id, result["chat_id"]))
-
-            connection.commit()
-        bot.send_message(
-            result["chat_id"],
-            "Ваш товар оплачен юзером @" + message.from_user.username,
-            reply_markup=markups.main
-        )
-        bot.send_message(
-            message.chat.id, "Операция прошла успешно", reply_markup=markups.main
-        )
-    else:
-        msg = bot.send_message(
+                connection.commit()
+            bot.send_message(
+                result["chat_id"],
+                "Ваш товар оплачен юзером @" + message.from_user.username,
+                reply_markup=markups.main
+            )
+            bot.send_message(
+                message.chat.id, "Операция прошла успешно", reply_markup=markups.main
+            )
+        else:
+            msg = bot.send_message(
+                message.chat.id, "Что-то пошло не так", reply_markup=markups.transaction
+            )
+            bot.register_next_step_handler(msg, confirmation)
+    except:
+        msg = bot.send_message (
             message.chat.id, "Что-то пошло не так", reply_markup=markups.transaction
-        )
+            )
         bot.register_next_step_handler(msg, confirmation)
 
 
