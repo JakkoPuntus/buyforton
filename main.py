@@ -139,7 +139,9 @@ def def_category(message):
     global name
     global isItItem
     name = str(message.chat.id) + ".txt"
+    
     try:
+        os.remove(name)
         log = open(name, "x", encoding="utf-8")
     except:
         log = open(name, "r+", encoding="utf-8")
@@ -153,7 +155,7 @@ def def_category(message):
         log.write("#товар \n")
     else:
         msg = bot.send_message(
-            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories_service
+            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories
         )
         isItItem = False
         log.write("#услуга \n")
@@ -427,7 +429,6 @@ def finishing(message, wallet):
                     )
                 )
             connection.commit()
-    os.remove(name)
 
 
 @bot.message_handler(regexp=regexps.support)
