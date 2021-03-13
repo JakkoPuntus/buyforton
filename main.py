@@ -284,6 +284,12 @@ def seller(message):
             bot.register_next_step_handler(msg, guarantee)
 
 def guarantee(message):
+    grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard = False)
+    grnt_yes = telebot.types.KeyboardButton("Да")
+    grnt_no = telebot.types.KeyboardButton("Нет")
+
+    grnt.row(grnt_yes, grnt_no)
+    grnt.row(markups.cancel)
 
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
@@ -292,7 +298,7 @@ def guarantee(message):
         msg = bot.send_message(
             message.chat.id,
             "6. Использовать гаранта?",
-            reply_markup=markups.appeal,
+            reply_markup = grnt,
         )
         bot.register_next_step_handler(msg, TON_wallet)
 
