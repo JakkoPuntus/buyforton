@@ -298,7 +298,7 @@ def seller(message):
             bot.register_next_step_handler(msg, guarantee)
 
 def guarantee(message):
-    grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard = False)
+    grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
     grnt_yes = telebot.types.KeyboardButton("Да")
     grnt_no = telebot.types.KeyboardButton("Нет")
 
