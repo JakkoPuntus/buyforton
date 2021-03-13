@@ -309,7 +309,6 @@ def TON_wallet(message):
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
-        bot.send_message(message.chat.id, "is it Item: " + str(isItItem))
         if isItItem == True:
             log.write("Продавец: " + message.text + "\n")
             msg = bot.send_message(
