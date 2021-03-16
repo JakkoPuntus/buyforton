@@ -12,22 +12,24 @@ import logging
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import os
 
-bot = telebot.TeleBot(TOKEN, num_threads=4, parse_mode = "HTML")
+bot = telebot.TeleBot(TOKEN, num_threads=4, parse_mode="HTML")
 logging.basicConfig(level=logging.DEBUG)
+
 
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
-    buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+    buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password = "8KH6Jcu00ImP",
+        password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
     if message.text == "/start":
-        bot.send_message(message.chat.id, hello_text, reply_markup=markups.main)
+        bot.send_message(message.chat.id, hello_text,
+                         reply_markup=markups.main)
     else:
         buy_id = message.text.replace("/start ", "")
         try:
@@ -39,7 +41,7 @@ def send_welcome(message):
                     cursor.execute(sql, (buy_id))
                     result = cursor.fetchone()
             buy_message = "Вы выбрали товар №{res}\n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}</a> и договоритесь об условиях доставки.\n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
-                res=buy_id, id = result['chat_id'], nickname=result['nickname'] 
+                res=buy_id, id=result['chat_id'], nickname=result['nickname']
             )
             buying.row("Оплатить " + str(buy_id))
             bot.send_message(message.chat.id, buy_message, reply_markup=buying)
@@ -47,13 +49,16 @@ def send_welcome(message):
             bot.send_message(message.chat.id, str(buy_id), reply_markup=buying)
             print(e)
 
+
 @bot.message_handler(commands=["admin"])
 def create_admin_panel(message):
     print(message.chat.id in admins_list)
     if message.chat.id in admins_list:
         admin_btn = telebot.types.KeyboardButton("Панель администратора")
         markups.main.row(admin_btn)
-    bot.send_message(message.chat.id, "админ панель добавлена", reply_markup= markups.main)
+    bot.send_message(message.chat.id, "админ панель добавлена",
+                     reply_markup=markups.main)
+
 
 @bot.message_handler(regexp="Панель администратора")
 def admin_panel(message):
@@ -62,9 +67,12 @@ def admin_panel(message):
     else:
         bot.send_message(message.chat.id, "Пшел вон, шавка, не админ ты!")
 
+
 @bot.message_handler(commands=["ban"])
 def ban_user(message):
-    bot.send_message(message.chat.id, '<a href="tg://user?id=564941525">Текст ссылки</a>')
+    bot.send_message(
+        message.chat.id, '<a href="tg://user?id=564941525">Текст ссылки</a>')
+
 
 @bot.message_handler(commands=["accept"])
 def acception(message):
@@ -75,7 +83,6 @@ def acception(message):
             index = message.text.index("!")+1
             new_category = message.text[index:]
             new_category = new_category.replace(" ", "")
-            
 
         try:
             channel_to_send = "dmth"
@@ -92,25 +99,28 @@ def acception(message):
                 index = message.text.index("!")+1
                 new_channel = message.text[index:]
                 new_channel = new_channel.replace(" ", "")
-                
+
                 try:
-                    a = "Категория: " + message.reply_to_message.text.replace(channel_to_send, config.commands[new_channel])
+                    a = "Категория: " + \
+                        message.reply_to_message.text.replace(
+                            channel_to_send, config.commands[new_channel])
                     print(a)
                     bot.edit_message_text(
                         a,
                         message.chat.id,
                         message.reply_to_message.id,
-                        reply_markup = inline
+                        reply_markup=inline
                     )
                 except:
-                    a = message.reply_to_message.caption.replace(channel_to_send, config.commands[new_channel])
-                    
+                    a = message.reply_to_message.caption.replace(
+                        channel_to_send, config.commands[new_channel])
+
                     print(a)
                     bot.edit_message_caption(
                         a,
                         message.chat.id,
                         message.reply_to_message.id,
-                        reply_markup = inline
+                        reply_markup=inline
                     )
             channel_to_send = channel_to_send.replace('Категория: ', '')
             if new_channel != None:
@@ -120,12 +130,14 @@ def acception(message):
             print(config.categories[channel_to_send])
             print()
             try:
-                bot.send_message(config.categories[channel_to_send], message.reply_to_message.text, reply_markup = inline)
+                bot.send_message(
+                    config.categories[channel_to_send], message.reply_to_message.text, reply_markup=inline)
             except:
                 photo = message.reply_to_message.photo[1].file_id
                 print(message.reply_to_message.text)
-                bot.send_photo(config.categories[channel_to_send], photo, message.reply_to_message.caption, reply_markup = inline)
-            
+                bot.send_photo(config.categories[channel_to_send], photo,
+                               message.reply_to_message.caption, reply_markup=inline)
+
         except Exception as e:
             print(e)
     else:
@@ -139,17 +151,17 @@ def def_category(message):
     global name
     global isItItem
     name = str(message.chat.id) + ".txt"
-    
+
     try:
         log = open(name, "x+", encoding="utf-8")
     except:
         log = open(name, "r+", encoding="utf-8")
         log.truncate(0)
-    
+
     if message.text == regexps.newproduct:
         msg = bot.send_message(
-        message.chat.id, "Пожалуйста, выберите категорию товара",
-        reply_markup = markups.categories
+            message.chat.id, "Пожалуйста, выберите категорию товара",
+            reply_markup=markups.categories
         )
         isItItem = True
         log.write("#товар \n")
@@ -160,6 +172,7 @@ def def_category(message):
         isItItem = False
         log.write("#услуга \n")
     bot.register_next_step_handler(msg, def_name)
+
 
 def def_name(message):
     global log
@@ -182,6 +195,7 @@ def def_name(message):
         print(e)
     bot.register_next_step_handler(msg, description)
 
+
 def description(message):
     global log
     global isItItem
@@ -189,7 +203,8 @@ def description(message):
     itemName = message.text
 
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         if isItItem:
             msg = bot.send_message(
@@ -202,11 +217,13 @@ def description(message):
         log.write("Название: " + message.text + "\n")
         bot.register_next_step_handler(msg, def_price)
 
+
 def def_price(message):
     global log
     global isItItem
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         if isItItem:
             msg = bot.send_message(
@@ -226,23 +243,27 @@ def def_price(message):
         else:
             bot.register_next_step_handler(msg, city)
 
+
 def delivery(message):
     global log
     global isItItem
     global price
     price = message.text
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         try:
             float(price)
             if float(price) < 2:
-                msg = bot.send_message(message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
+                msg = bot.send_message(
+                    message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
                 try:
-                    log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) + '">' + message.from_user.first_name + '</a> \n')
+                    log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
+                              '">' + message.from_user.first_name + '</a> \n')
                 except:
                     log.write("Продавец: публичное имя скрыто \n")
                 msg = bot.send_message(
@@ -252,10 +273,11 @@ def delivery(message):
                 )
                 bot.register_next_step_handler(msg, TON_wallet)
         except Exception as e:
-            msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
+            msg = bot.send_message(
+                message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
             print(e)
-        
+
 
 def city(message):
     global log
@@ -263,16 +285,19 @@ def city(message):
     global price
     price = message.text
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         try:
             float(price)
             if float(price) < 2:
-                msg = bot.send_message(message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
+                msg = bot.send_message(
+                    message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
-                log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) + '">' + message.from_user.first_name + '</a> \n')
+                log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
+                          '">' + message.from_user.first_name + '</a> \n')
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Город ",
@@ -280,15 +305,18 @@ def city(message):
                 )
                 bot.register_next_step_handler(msg, guarantee)
         except Exception as e:
-            msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
+            msg = bot.send_message(
+                message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, guarantee)
             print(e)
+
 
 def seller(message):
     global log
     global isItItem
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         if isItItem:
             log.write("Доставка: " + message.text + "\n")
@@ -304,8 +332,9 @@ def seller(message):
         else:
             bot.register_next_step_handler(msg, guarantee)
 
+
 def guarantee(message):
-    grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+    grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     grnt_yes = telebot.types.KeyboardButton("Да")
     grnt_no = telebot.types.KeyboardButton("Нет")
 
@@ -313,22 +342,25 @@ def guarantee(message):
     grnt.row(markups.cancel)
 
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         log.write("Доставка: " + message.text + "\n")
         msg = bot.send_message(
             message.chat.id,
             "6. Использовать гаранта?",
-            reply_markup = grnt,
+            reply_markup=grnt,
         )
         bot.register_next_step_handler(msg, TON_wallet)
+
 
 def TON_wallet(message):
     global log
     global isItItem
     global isGuaranteed
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         if isItItem == True:
             log.write("Доставка: " + message.text + "\n")
@@ -340,11 +372,13 @@ def TON_wallet(message):
             isGuaranteed = True
             bot.register_next_step_handler(msg, image)
         else:
-            if message.text == "Нет" or message.text == "нет" :
+            if message.text == "Нет" or message.text == "нет":
                 isGuaranteed = False
-                msg = bot.send_message(message.chat.id, "7. Фото", reply_markup=markups.photo)
+                msg = bot.send_message(
+                    message.chat.id, "7. Фото", reply_markup=markups.photo)
                 log.close()
-                bot.register_next_step_handler(msg, finishing, wallet = message.text)
+                bot.register_next_step_handler(
+                    msg, finishing, wallet=message.text)
             else:
                 isGuaranteed = True
                 msg = bot.send_message(
@@ -359,11 +393,13 @@ def image(message):
     global log
     global isItItem
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
-        msg = bot.send_message(message.chat.id, "Фото", reply_markup=markups.photo)
+        msg = bot.send_message(message.chat.id, "Фото",
+                               reply_markup=markups.photo)
         log.close()
-        bot.register_next_step_handler(msg, finishing, wallet = message.text)
+        bot.register_next_step_handler(msg, finishing, wallet=message.text)
 
 
 def finishing(message, wallet):
@@ -378,10 +414,10 @@ def finishing(message, wallet):
         inline.add(appeal_btn)
     else:
         inline = None
-    
 
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         loger = open(name, "r", encoding="utf-8")
         appeal = loger.read()
@@ -406,7 +442,8 @@ def finishing(message, wallet):
             if message.text == "Пропустить":
                 bot.send_message(nextAdmin, appeal, reply_markup=inline)
             else:
-                bot.send_photo(nextAdmin, message.photo[1].file_id, appeal, reply_markup=inline)
+                bot.send_photo(
+                    nextAdmin, message.photo[1].file_id, appeal, reply_markup=inline)
         except Exception as e:
             print(e)
         print
@@ -414,7 +451,7 @@ def finishing(message, wallet):
         connection = pymysql.connect(
             host="localhost",
             user="root",
-            password = "8KH6Jcu00ImP",
+            password="8KH6Jcu00ImP",
             database="buyforton",
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -447,7 +484,8 @@ def support_first(message):
 
 def support(message):
     if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "отменено",
+                         reply_markup=markups.main)
     else:
         bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
         bot.forward_message(nextAdmin, message.chat.id, message.message_id)
@@ -479,13 +517,14 @@ def buy_vip(message):
         + " или отсканируйте QR код (QR пока не тот)",
     )
 
+
 @bot.callback_query_handler(func=lambda message: message.data == "back")
 @bot.message_handler(regexp=regexps.shopcart)
 def shopcart(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password = "8KH6Jcu00ImP",
+        password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -512,7 +551,7 @@ def shopcart(message):
                 "Список ваших активных заказов",
                 message.message.chat.id,
                 message.message.id,
-                reply_markup = shpwl_markup
+                reply_markup=shpwl_markup
             )
 
     else:
@@ -524,7 +563,7 @@ def show_order(c):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password = "8KH6Jcu00ImP",
+        password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -540,27 +579,32 @@ def show_order(c):
             result = cursor.fetchone()
 
     order = telebot.types.InlineKeyboardMarkup()
-    confirm = telebot.types.InlineKeyboardButton("Подтвердить получение заказа", callback_data="confirm" + str(buy_id))
+    confirm = telebot.types.InlineKeyboardButton(
+        "Подтвердить получение заказа", callback_data="confirm" + str(buy_id))
     order.row(confirm)
     order.row(markups.back)
     try:
         bot.edit_message_text(
-            "ЗАКАЗ " + str(result["name"]) + " ценой " + str(result["price"]) + " TON",
+            "ЗАКАЗ " + str(result["name"]) + " ценой " +
+            str(result["price"]) + " TON",
             c.message.chat.id,
             c.message.id,
-            reply_markup = order
+            reply_markup=order
         )
     except:
-        bot.send_message(c.message.chat.id, "Хватит баловаться", reply_markup = markups.main)
+        bot.send_message(c.message.chat.id, "Хватит баловаться",
+                         reply_markup=markups.main)
     print(result)
+
 
 @bot.callback_query_handler(func=lambda c: c.data.find("confirm") != -1)
 def send_money(c):
-    bot.send_message(c.message.chat.id, "Деньги скоро будут отправлены продавцу. Спасибо, что пользуетесь BUYFORTON")
+    bot.send_message(
+        c.message.chat.id, "Деньги скоро будут отправлены продавцу. Спасибо, что пользуетесь BUYFORTON")
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password = "8KH6Jcu00ImP",
+        password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -586,31 +630,34 @@ def send_money(c):
             )
             cursor.execute(sql, (buy_id))
         connection.commit()
-        
-    
-    bot.send_message(c.message.chat.id, result['wallet'] + " " + str(result['price']) )
+
+    bot.send_message(c.message.chat.id,
+                     result['wallet'] + " " + str(result['price']))
     if result["price"] * 0.03 < 0.5:
         withdraw.send_ton(result['wallet'], result['price'] - 0.4)
     else:
-        withdraw.send_ton(result['wallet'], result['price'] - result['price'] * 0.03 )
+        withdraw.send_ton(result['wallet'],
+                          result['price'] - result['price'] * 0.03)
+
 
 @bot.message_handler(content_types=["text"])
 def repeat_all_messages(message):
 
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
-        
+
         if message.text.find("Оплатить") != -1:
             global buy_id
             global price
             buy_id = int(message.text.replace("Оплатить ", ""))
             connection = pymysql.connect(
-            host="localhost",
-            user="root",
-            password = "8KH6Jcu00ImP",
-            database="buyforton",
-            cursorclass=pymysql.cursors.DictCursor
+                host="localhost",
+                user="root",
+                password="8KH6Jcu00ImP",
+                database="buyforton",
+                cursorclass=pymysql.cursors.DictCursor
             )
             with connection:
                 with connection.cursor() as cursor:
@@ -622,7 +669,8 @@ def repeat_all_messages(message):
 
                 msg = bot.send_message(
                     message.chat.id,
-                    "Переведите {price} тон на следующий кошелек: ".format(price=price)
+                    "Переведите {price} тон на следующий кошелек: ".format(
+                        price=price)
                     + TON_ADRESS
                     + " с комментарием «kuna-2gs4kaytt5» и нажмите «Подтвердить». Перед отправкой советуем ознакомиться с руководством по ссылке \n https://telegra.ph/BUYFORTON-Oplata-03-04",
                     reply_markup=markups.transaction,
@@ -641,7 +689,8 @@ def repeat_all_messages(message):
 
 def confirmation(message):
     if message.text == "Отменить":
-        bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
     else:
         try:
             msg = bot.send_message(
@@ -663,7 +712,7 @@ def confirmation_second(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password = "8KH6Jcu00ImP",
+        password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -673,7 +722,7 @@ def confirmation_second(message):
         msg_chk = transaction_checker.check_message(
             tr_chk["transactions"][0]["out_msgs"][0]
         )
-    
+
         if (
             tr_chk["transactions"][0]["status"] == 3
             and msg_chk["messages"][0]["dst"] == TON_ADRESS
@@ -688,12 +737,14 @@ def confirmation_second(message):
                     result = cursor.fetchone()
                 with connection.cursor() as cursor:
                     sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
-                    cursor.execute(sql, (buy_id, message.chat.id, result["chat_id"]))
+                    cursor.execute(
+                        sql, (buy_id, message.chat.id, result["chat_id"]))
 
                 connection.commit()
             bot.send_message(
                 result["chat_id"],
-                'Ваш товар ценой {price} TON оплачен юзером <a href="tg://user?id={chat_id}">{nickname}</a> '.format(price = result["price"], chat_id = result["chat_id"], nickname = result["nickname"]),
+                'Ваш товар ценой {price} TON оплачен юзером <a href="tg://user?id={chat_id}">{nickname}</a> '.format(
+                    price=result["price"], chat_id=result["chat_id"], nickname=result["nickname"]),
                 reply_markup=markups.main
             )
             bot.send_message(
@@ -705,9 +756,9 @@ def confirmation_second(message):
             )
             bot.register_next_step_handler(msg, confirmation)
     except:
-        msg = bot.send_message (
+        msg = bot.send_message(
             message.chat.id, "Что-то пошло не так. Отправьте id транзакции еще раз.", reply_markup=markups.transaction
-            )
+        )
         bot.register_next_step_handler(msg, confirmation_second)
 
 
@@ -717,6 +768,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         pass
-
-
-#for git
