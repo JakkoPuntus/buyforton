@@ -12,8 +12,8 @@ import logging
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import os
 
-bot = telebot.TeleBot(TOKEN, num_threads=4)
-#logging.basicConfig(level=logging.DEBUG)
+bot = telebot.TeleBot(TOKEN, num_threads=4, parse_mode = "HTML")
+logging.basicConfig(level=logging.DEBUG)
 
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
@@ -64,7 +64,7 @@ def admin_panel(message):
 
 @bot.message_handler(commands=["ban"])
 def ban_user(message):
-    bot.kick_chat_member(message.chat.id, message.chat.id)
+    bot.send_message(message.chat.id, '<a href="tg://user?id=564941525">Текст ссылки</a>')
 
 @bot.message_handler(commands=["accept"])
 def acception(message):
@@ -241,7 +241,10 @@ def delivery(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
-                log.write("Продавец: @" + message.from_user.username + "\n")
+                try:
+                    log.write('Продавец: <a href="tg://user?id=' + str(message.from_user.id) + '"' + message.from_user.first_name + '</a>')
+                except:
+                    log.write("Продавец: публичное имя скрыто \n")
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Доставка по РБ (цена и условия) ",
@@ -269,7 +272,7 @@ def city(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
-                log.write("Продавец: @" + message.from_user.username + "\n")
+                log.write('Продавец: <a href="tg://user?id=' + str(message.from_user.id) + '"' + message.from_user.first_name + '</a>')
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Город ",
