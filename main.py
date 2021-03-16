@@ -91,10 +91,16 @@ def acception(message):
                     if "Категория:" in i:
                         channel_to_send = i
                         print(channel_to_send)
+                for i in message.reply_to_message.text.split("\n"):
+                    if "Продавец:" in i:
+                        seller = i
             elif message.reply_to_message.caption != None:
                 for i in message.reply_to_message.caption.split("\n"):
                     if "Категория:" in i:
                         channel_to_send = i
+                for i in message.reply_to_message.text.split("\n"):
+                    if "Продавец:" in i:
+                        seller = i                
             if message.text.find('!') != -1:
                 index = message.text.index("!")+1
                 new_channel = message.text[index:]
@@ -123,6 +129,7 @@ def acception(message):
                         reply_markup=inline
                     )
             channel_to_send = channel_to_send.replace('Категория: ', '')
+            seller = int(seller.replace('Продавец: ', ''))
             if new_channel != None:
                 channel_to_send = config.commands[new_channel]
                 channel_to_send = channel_to_send.replace('Категория: ', '')
@@ -130,13 +137,15 @@ def acception(message):
             print(config.categories[channel_to_send])
             print()
             try:
-                bot.send_message(
+                msg = bot.send_message(
                     config.categories[channel_to_send], message.reply_to_message.text, reply_markup=inline)
             except:
                 photo = message.reply_to_message.photo[1].file_id
                 print(message.reply_to_message.text)
-                bot.send_photo(config.categories[channel_to_send], photo,
+                msg = bot.send_photo(config.categories[channel_to_send], photo,
                                message.reply_to_message.caption, reply_markup=inline)
+            bot.send_message(seller, 'ваше объявление опубликовано')
+            bot.forward_message(seller, msg.chat.id, msg.id )
 
         except Exception as e:
             print(e)
