@@ -38,7 +38,7 @@ def send_welcome(message):
                     sql = "SELECT `nickname`, `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
                     cursor.execute(sql, (buy_id))
                     result = cursor.fetchone()
-            buy_message = "Вы выбрали товар №{res} \n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}}</a> и договоритесь об условиях доставки. \n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
+            buy_message = "Вы выбрали товар №{res} \n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}</a> и договоритесь об условиях доставки. \n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
                 res=buy_id, id = result['chat_id'], nickname=result['nickname'] 
             )
             buying.row("Оплатить " + str(buy_id))
@@ -693,7 +693,7 @@ def confirmation_second(message):
                 connection.commit()
             bot.send_message(
                 result["chat_id"],
-                'Ваш товар ценой {price} TON оплачен юзером <a href="tg://user?id={chat_id}">{nickname}}</a> '.format(price = result["price"], chat_id = result["chat_id"], nickname = result["nickname"]),
+                'Ваш товар ценой {price} TON оплачен юзером <a href="tg://user?id={chat_id}">{nickname}</a> '.format(price = result["price"], chat_id = result["chat_id"], nickname = result["nickname"]),
                 reply_markup=markups.main
             )
             bot.send_message(
