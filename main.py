@@ -35,11 +35,11 @@ def send_welcome(message):
 
                 with connection.cursor() as cursor:
                     # Read a single record
-                    sql = "SELECT `nickname` FROM `buyforton_appeals` WHERE `message_id`=%s"
+                    sql = "SELECT `nickname`, `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
                     cursor.execute(sql, (buy_id))
                     result = cursor.fetchone()
-            buy_message = "Вы выбрали товар №{res} \n Перед тем, как оплатить его, обязательно свяжитесь с продавцом @{nickname} и договоритесь об условиях доставки. \n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
-                res=buy_id, nickname=result["nickname"]
+            buy_message = "Вы выбрали товар №{res} \n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}}</a> и договоритесь об условиях доставки. \n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
+                res=buy_id, id = result['chat_id'], nickname=result['nickname'] 
             )
             buying.row("Оплатить " + str(buy_id))
             bot.send_message(message.chat.id, buy_message, reply_markup=buying)
@@ -242,7 +242,7 @@ def delivery(message):
             else:
                 log.write("Цена: " + message.text + "💎\n")
                 try:
-                    log.write('Продавец: <a href="tg://user?id=' + str(message.from_user.id) + '"' + message.from_user.first_name + '</a>')
+                    log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) + '">' + message.from_user.first_name + '</a> \n')
                 except:
                     log.write("Продавец: публичное имя скрыто \n")
                 msg = bot.send_message(
@@ -272,7 +272,7 @@ def city(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
-                log.write('Продавец: <a href="tg://user?id=' + str(message.from_user.id) + '"' + message.from_user.first_name + '</a>')
+                log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) + '">' + message.from_user.first_name + '</a> \n')
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Город ",
@@ -366,7 +366,7 @@ def image(message):
         bot.register_next_step_handler(msg, finishing, wallet = message.text)
 
 
-def finishing(message, wallet = "None"):
+def finishing(message, wallet):
     global log
     global price
     global isGuaranteed
@@ -427,7 +427,7 @@ def finishing(message, wallet = "None"):
                     sql,
                     (
                         message.message_id,
-                        message.from_user.username,
+                        message.from_user.first_name,
                         message.chat.id,
                         price,
                         itemName,
@@ -683,7 +683,7 @@ def confirmation_second(message):
             with connection:
                 with connection.cursor() as cursor:
                     # Read a single record
-                    sql = "SELECT `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
+                    sql = "SELECT `chat_id`, `price`, `nickname` FROM `buyforton_appeals` WHERE `message_id`=%s"
                     cursor.execute(sql, (buy_id))
                     result = cursor.fetchone()
                 with connection.cursor() as cursor:
@@ -693,7 +693,7 @@ def confirmation_second(message):
                 connection.commit()
             bot.send_message(
                 result["chat_id"],
-                "Ваш товар оплачен юзером @" + message.from_user.username,
+                'Ваш товар ценой {price} TON оплачен юзером <a href="tg://user?id={chat_id}">{nickname}}</a> '.format(price = result["price"], chat_id = result["chat_id"], nickname = result["nickname"]),
                 reply_markup=markups.main
             )
             bot.send_message(
