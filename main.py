@@ -246,7 +246,7 @@ def delivery(message):
                     "4.Доставка по РБ (цена и условия) ",
                     reply_markup=markups.appeal,
                 )
-                bot.register_next_step_handler(msg, guarantee)
+                bot.register_next_step_handler(msg, TON_wallet)
         except Exception as e:
             msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
@@ -311,7 +311,7 @@ def guarantee(message):
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
-        log.write("Продавец: " + message.text + "\n")
+        log.write("Доставка: " + message.text + "\n")
         msg = bot.send_message(
             message.chat.id,
             "6. Использовать гаранта?",
@@ -327,7 +327,7 @@ def TON_wallet(message):
         bot.send_message(message.chat.id, "Отменено", reply_markup=markups.main)
     else:
         if isItItem == True:
-            log.write("Продавец: " + message.text + "\n")
+            log.write("Доставка: " + message.text + "\n")
             msg = bot.send_message(
                 message.chat.id,
                 "6. Адрес вашего TON кошелька",
