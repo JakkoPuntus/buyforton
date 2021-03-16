@@ -241,6 +241,7 @@ def delivery(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
+                log.write("Продавец: @" + message.from_user.username + "\n")
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Доставка по РБ (цена и условия) ",
@@ -268,7 +269,7 @@ def city(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
-                log.write("Продавец: " + message.from_user.username + "\n")
+                log.write("Продавец: @" + message.from_user.username + "\n")
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Город ",
