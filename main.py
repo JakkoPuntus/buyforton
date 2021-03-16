@@ -9,7 +9,7 @@ import pymysql.cursors
 import config
 import withdraw
 import logging
-from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list, DEBUG_TOKEN
+from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import os
 
 bot = telebot.TeleBot(TOKEN, num_threads=4)
