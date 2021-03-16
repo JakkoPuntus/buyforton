@@ -1,11 +1,11 @@
 import telebot
 import regexps
 
-main = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
-appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
-photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
-buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
-transaction = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+main = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+transaction = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 
 
 newproduct = telebot.types.KeyboardButton(regexps.newproduct)
@@ -17,7 +17,7 @@ skip = telebot.types.KeyboardButton(regexps.skip)
 vip = telebot.types.KeyboardButton(regexps.vip)
 confirm = telebot.types.KeyboardButton(regexps.confirm)
 shopcart = telebot.types.KeyboardButton(regexps.shopcart)
-back = telebot.types.InlineKeyboardButton(regexps.back, callback_data = "back")
+back = telebot.types.InlineKeyboardButton(regexps.back, callback_data="back")
 
 main.row(newproduct, newservice)
 main.row(donate, support)
@@ -26,9 +26,9 @@ appeal.row(cancel)
 photo.row(cancel, skip)
 transaction.row(cancel, confirm)
 
-#categories
+# categories
 general = telebot.types.KeyboardButton("🛍🛒Общая")
-hand_made =  telebot.types.KeyboardButton('🧶🧵🎨 Хэнд-мейд')
+hand_made = telebot.types.KeyboardButton('🧶🧵🎨 Хэнд-мейд')
 souvenirs = telebot.types.KeyboardButton('🏆🏺🎁 Сувениры ')
 food = telebot.types.KeyboardButton('🍰🍒🍗 Продукты питания ')
 pets = telebot.types.KeyboardButton('🐶🐱Домашние питомцы')
@@ -43,8 +43,10 @@ pay = telebot.types.KeyboardButton('💵💎Оплата за TON')
 general_service = telebot.types.KeyboardButton('🤝Прочие услуги')
 
 
-categories = telebot.types.ReplyKeyboardMarkup(selective = False, resize_keyboard = True)
-categories_service =  telebot.types.ReplyKeyboardMarkup(selective = False, resize_keyboard = True)
+categories = telebot.types.ReplyKeyboardMarkup(
+    selective=False, resize_keyboard=True)
+categories_service = telebot.types.ReplyKeyboardMarkup(
+    selective=False, resize_keyboard=True)
 
 categories.row(hand_made, souvenirs, food)
 categories.row(pets, holiday, digital)
