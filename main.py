@@ -9,12 +9,11 @@ import pymysql.cursors
 import config
 import withdraw
 import logging
-from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
+from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list, DEBUG_TOKEN
 import os
 
 bot = telebot.TeleBot(TOKEN, num_threads=4)
 #logging.basicConfig(level=logging.DEBUG)
-
 
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
@@ -126,6 +125,7 @@ def acception(message):
                 photo = message.reply_to_message.photo[1].file_id
                 print(message.reply_to_message.text)
                 bot.send_photo(config.categories[channel_to_send], photo, message.reply_to_message.caption, reply_markup = inline)
+            
         except Exception as e:
             print(e)
     else:
@@ -211,7 +211,7 @@ def def_price(message):
         if isItItem:
             msg = bot.send_message(
                 message.chat.id,
-                "3. Цена товара в TON (только число)",
+                "3. Цена товара в TON (только число, минимум 2)",
                 reply_markup=markups.appeal,
             )
         else:
@@ -246,7 +246,7 @@ def delivery(message):
                     "4.Доставка по РБ (цена и условия) ",
                     reply_markup=markups.appeal,
                 )
-                bot.register_next_step_handler(msg, seller)
+                bot.register_next_step_handler(msg, guarantee)
         except Exception as e:
             msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
             bot.register_next_step_handler(msg, delivery)
@@ -268,15 +268,16 @@ def city(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 log.write("Цена: " + message.text + "💎\n")
+                log.write("Продавец: " + message.from_user.username + "\n")
                 msg = bot.send_message(
                     message.chat.id,
                     "4.Город ",
                     reply_markup=markups.appeal,
                 )
-                bot.register_next_step_handler(msg, seller)
+                bot.register_next_step_handler(msg, guarantee)
         except Exception as e:
             msg = bot.send_message(message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
-            bot.register_next_step_handler(msg, city)
+            bot.register_next_step_handler(msg, guarantee)
             print(e)
 
 def seller(message):
@@ -538,12 +539,15 @@ def show_order(c):
     confirm = telebot.types.InlineKeyboardButton("Подтвердить получение заказа", callback_data="confirm" + str(buy_id))
     order.row(confirm)
     order.row(markups.back)
-    bot.edit_message_text(
-        "ЗАКАЗ " + str(result["name"]) + " ценой " + str(result["price"]) + " TON",
-        c.message.chat.id,
-        c.message.id,
-        reply_markup = order
-    )
+    try:
+        bot.edit_message_text(
+            "ЗАКАЗ " + str(result["name"]) + " ценой " + str(result["price"]) + " TON",
+            c.message.chat.id,
+            c.message.id,
+            reply_markup = order
+        )
+    except:
+        bot.send_message(c.message.chat.id, "Хватит баловаться", reply_markup = markups.main)
     print(result)
 
 @bot.callback_query_handler(func=lambda c: c.data.find("confirm") != -1)
@@ -661,11 +665,11 @@ def confirmation_second(message):
     )
 
     tr_chk = transaction_checker.check_transaction(message.text)
-    msg_chk = transaction_checker.check_message(
-        tr_chk["transactions"][0]["out_msgs"][0]
-    )
-    print(tr_chk)
     try:
+        msg_chk = transaction_checker.check_message(
+            tr_chk["transactions"][0]["out_msgs"][0]
+        )
+    
         if (
             tr_chk["transactions"][0]["status"] == 3
             and msg_chk["messages"][0]["dst"] == TON_ADRESS
@@ -698,9 +702,9 @@ def confirmation_second(message):
             bot.register_next_step_handler(msg, confirmation)
     except:
         msg = bot.send_message (
-            message.chat.id, "Что-то пошло не так", reply_markup=markups.transaction
+            message.chat.id, "Что-то пошло не так. Отправьте id транзакции еще раз.", reply_markup=markups.transaction
             )
-        bot.register_next_step_handler(msg, confirmation)
+        bot.register_next_step_handler(msg, confirmation_second)
 
 
 if __name__ == "__main__":
