@@ -366,7 +366,7 @@ def image(message):
         bot.register_next_step_handler(msg, finishing, wallet = message.text)
 
 
-def finishing(message, wallet):
+def finishing(message, wallet = "None"):
     global log
     global price
     global isGuaranteed
