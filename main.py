@@ -130,340 +130,342 @@ def acception(message):
     else:
         bot.send_message(message.chat.id, "Вы не админ")
 
+try: 
+    @bot.message_handler(regexp=regexps.newproduct)
+    @bot.message_handler(regexp=regexps.newservice)
+    def def_category(message):
+        global log
+        global name
+        global isItItem
+        name = str(message.chat.id) + ".txt"
 
-@bot.message_handler(regexp=regexps.newproduct)
-@bot.message_handler(regexp=regexps.newservice)
-def def_category(message):
-    global log
-    global name
-    global isItItem
-    name = str(message.chat.id) + ".txt"
+        try:
+            log = open(name, "x+", encoding="utf-8")
+        except:
+            log = open(name, "r+", encoding="utf-8")
+            log.truncate(0)
 
-    try:
-        log = open(name, "x+", encoding="utf-8")
-    except:
-        log = open(name, "r+", encoding="utf-8")
-        log.truncate(0)
-
-    if message.text == regexps.newproduct:
-        msg = bot.send_message(
-            message.chat.id, "Пожалуйста, выберите категорию товара",
-            reply_markup=markups.categories
-        )
-        isItItem = True
-        log.write("#товар \n")
-    else:
-        msg = bot.send_message(
-            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories_service
-        )
-        isItItem = False
-        log.write("#услуга \n")
-    bot.register_next_step_handler(msg, def_name)
-
-
-def def_name(message):
-    global log
-    global name
-    global isItItem
-    try:
-        if message.text in config.categories and message.text != '💵💎Оплата за TON' and message.text != '🤝Прочие услуги':
+        if message.text == regexps.newproduct:
             msg = bot.send_message(
-                message.chat.id, "1. Название товара", reply_markup=markups.appeal
+                message.chat.id, "Пожалуйста, выберите категорию товара",
+                reply_markup=markups.categories
             )
             isItItem = True
-            log.write("Категория: " + message.text + "\n")
+            log.write("#товар \n")
         else:
             msg = bot.send_message(
-                message.chat.id, "1. Название услуги", reply_markup=markups.appeal
+                message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories_service
             )
             isItItem = False
-            log.write("Категория: " + message.text + "\n")
-    except Exception as e:
-        print(e)
-    bot.register_next_step_handler(msg, description)
+            log.write("#услуга \n")
+        bot.register_next_step_handler(msg, def_name)
 
 
-def description(message):
-    global log
-    global isItItem
-    global itemName
-    itemName = message.text
-
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        if isItItem:
-            msg = bot.send_message(
-                message.chat.id, "2. Описание  товара", reply_markup=markups.appeal
-            )
-        else:
-            msg = bot.send_message(
-                message.chat.id, "2. Описание  услуги", reply_markup=markups.appeal
-            )
-        log.write("Название: " + message.text + "\n")
-        bot.register_next_step_handler(msg, def_price)
-
-
-def def_price(message):
-    global log
-    global isItItem
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        if isItItem:
-            msg = bot.send_message(
-                message.chat.id,
-                "3. Цена товара в TON (только число, минимум 2)",
-                reply_markup=markups.appeal,
-            )
-        else:
-            msg = bot.send_message(
-                message.chat.id,
-                "3. Цена услуги в TON (только число, минимум 2)",
-                reply_markup=markups.appeal,
-            )
-        log.write("Описание: " + message.text + "\n")
-        bot.register_next_step_handler(msg, quantity)
-
-
-def quantity(message):
-    global log
-    global isItItem
-    global price
-    price = message.text
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
+    def def_name(message):
+        global log
+        global name
+        global isItItem
         try:
-            float(price)
-            if float(price) < 2:
+            if message.text in config.categories and message.text != '💵💎Оплата за TON' and message.text != '🤝Прочие услуги':
                 msg = bot.send_message(
-                    message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
-                bot.register_next_step_handler(msg, quantity)
+                    message.chat.id, "1. Название товара", reply_markup=markups.appeal
+                )
+                isItItem = True
+                log.write("Категория: " + message.text + "\n")
             else:
-                log.write("Цена: " + message.text + "💎\n")
-                try:
-                    log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
-                              '">' + message.from_user.first_name + '</a> \n')
-                except:
-                    log.write("Продавец: публичное имя скрыто \n")
-                if isItItem:
+                msg = bot.send_message(
+                    message.chat.id, "1. Название услуги", reply_markup=markups.appeal
+                )
+                isItItem = False
+                log.write("Категория: " + message.text + "\n")
+        except Exception as e:
+            print(e)
+        bot.register_next_step_handler(msg, description)
+
+
+    def description(message):
+        global log
+        global isItItem
+        global itemName
+        itemName = message.text
+
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            if isItItem:
+                msg = bot.send_message(
+                    message.chat.id, "2. Описание  товара", reply_markup=markups.appeal
+                )
+            else:
+                msg = bot.send_message(
+                    message.chat.id, "2. Описание  услуги", reply_markup=markups.appeal
+                )
+            log.write("Название: " + message.text + "\n")
+            bot.register_next_step_handler(msg, def_price)
+
+
+    def def_price(message):
+        global log
+        global isItItem
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            if isItItem:
+                msg = bot.send_message(
+                    message.chat.id,
+                    "3. Цена товара в TON (только число, минимум 2)",
+                    reply_markup=markups.appeal,
+                )
+            else:
+                msg = bot.send_message(
+                    message.chat.id,
+                    "3. Цена услуги в TON (только число, минимум 2)",
+                    reply_markup=markups.appeal,
+                )
+            log.write("Описание: " + message.text + "\n")
+            bot.register_next_step_handler(msg, quantity)
+
+
+    def quantity(message):
+        global log
+        global isItItem
+        global price
+        price = message.text
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            try:
+                float(price)
+                if float(price) < 2:
                     msg = bot.send_message(
-                        message.chat.id, '4. Сколько товаров вы хотите продать (только число)', reply_markup=markups.appeal)
+                        message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
+                    bot.register_next_step_handler(msg, quantity)
+                else:
+                    log.write("Цена: " + message.text + "💎\n")
+                    try:
+                        log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
+                                '">' + message.from_user.first_name + '</a> \n')
+                    except:
+                        log.write("Продавец: публичное имя скрыто \n")
+                    if isItItem:
+                        msg = bot.send_message(
+                            message.chat.id, '4. Сколько товаров вы хотите продать (только число)', reply_markup=markups.appeal)
+                        bot.register_next_step_handler(msg, delivery)
+                    else:
+                        msg = bot.send_message(message.chat.id, '4. Ваша услуга:',
+                                            reply_markup=markups.isServiceReusable)
+                        bot.register_next_step_handler(msg, city)
+            except Exception as e:
+                msg = bot.send_message(
+                    message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
+                bot.register_next_step_handler(msg, quantity)
+                print(e)
+
+
+    def delivery(message):
+        global log
+        global quantity
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            quantity = message.text
+            try:
+                int(quantity)
+                if quantity == 0:
+                    msg = bot.send_message(
+                        message.chat.id, "Неверный формат, необходимо ввести натуральное число. Введите ещё раз.", reply_markup=markups.appeal)
                     bot.register_next_step_handler(msg, delivery)
                 else:
-                    msg = bot.send_message(message.chat.id, '4. Ваша услуга:',
-                                           reply_markup=markups.isServiceReusable)
-                    bot.register_next_step_handler(msg, city)
-        except Exception as e:
-            msg = bot.send_message(
-                message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
-            bot.register_next_step_handler(msg, quantity)
-            print(e)
+                    msg = bot.send_message(
+                        message.chat.id, '5. Доставка по РБ (цена и условия)', reply_markup=markups.appeal)
+                    bot.register_next_step_handler(msg, TON_wallet)
 
-
-def delivery(message):
-    global log
-    global quantity
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        quantity = message.text
-        try:
-            int(quantity)
-            if quantity == 0:
+            except:
                 msg = bot.send_message(
                     message.chat.id, "Неверный формат, необходимо ввести натуральное число. Введите ещё раз.", reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, delivery)
-            else:
-                msg = bot.send_message(
-                    message.chat.id, '5. Доставка по РБ (цена и условия)', reply_markup=markups.appeal)
-                bot.register_next_step_handler(msg, TON_wallet)
-
-        except:
-            msg = bot.send_message(
-                message.chat.id, "Неверный формат, необходимо ввести натуральное число. Введите ещё раз.", reply_markup=markups.appeal)
-            bot.register_next_step_handler(msg, delivery)
 
 
-def city(message):
-    global log
-    global isItItem
-    global quantity
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        quantity = message.text
-        
-        if quantity != "Многоразовая" and quantity != 'Одноразовая':
-            msg = bot.send_message(
-                message.chat.id, "Не балуйся! Выбери еще раз.", reply_markup=markups.isServiceReusable)
-            bot.register_next_step_handler(msg, city)
-        elif quantity == "Многоразовая":
-            quantity = 1024
-            msg = bot.send_message(message.chat.id, '5. Город')
-            bot.register_next_step_handler(msg, guarantee)
-        elif quantity == "Одноразовая":
-            quantity = 1
-            msg = bot.send_message(message.chat.id, '5. Город')
-            bot.register_next_step_handler(msg, guarantee)
-
-
-def guarantee(message):
-    grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    grnt_yes = telebot.types.KeyboardButton("Да")
-    grnt_no = telebot.types.KeyboardButton("Нет")
-
-    grnt.row(grnt_yes, grnt_no)
-    grnt.row(markups.cancel)
-
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        if isItItem:
-            log.write("Доставка: " + message.text + "\n")
+    def city(message):
+        global log
+        global isItItem
+        global quantity
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
         else:
-            log.write("Город: " + message.text + "\n")
-        msg = bot.send_message(
-            message.chat.id,
-            "6. Использовать гаранта?",
-            reply_markup=grnt,
-        )
-        bot.register_next_step_handler(msg, TON_wallet)
+            quantity = message.text
+            
+            if quantity != "Многоразовая" and quantity != 'Одноразовая':
+                msg = bot.send_message(
+                    message.chat.id, "Не балуйся! Выбери еще раз.", reply_markup=markups.isServiceReusable)
+                bot.register_next_step_handler(msg, city)
+            elif quantity == "Многоразовая":
+                quantity = 1024
+                msg = bot.send_message(message.chat.id, '5. Город')
+                bot.register_next_step_handler(msg, guarantee)
+            elif quantity == "Одноразовая":
+                quantity = 1
+                msg = bot.send_message(message.chat.id, '5. Город')
+                bot.register_next_step_handler(msg, guarantee)
 
 
-def TON_wallet(message):
-    global log
-    global isItItem
-    global isGuaranteed
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        if isItItem == True:
+    def guarantee(message):
+        grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        grnt_yes = telebot.types.KeyboardButton("Да")
+        grnt_no = telebot.types.KeyboardButton("Нет")
+
+        grnt.row(grnt_yes, grnt_no)
+        grnt.row(markups.cancel)
+
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            if isItItem:
+                log.write("Доставка: " + message.text + "\n")
+            else:
+                log.write("Город: " + message.text + "\n")
             msg = bot.send_message(
                 message.chat.id,
-                "7. Адрес вашего TON кошелька",
-                reply_markup=markups.appeal,
+                "6. Использовать гаранта?",
+                reply_markup=grnt,
             )
-            isGuaranteed = True
-            bot.register_next_step_handler(msg, image)
+            bot.register_next_step_handler(msg, TON_wallet)
+
+
+    def TON_wallet(message):
+        global log
+        global isItItem
+        global isGuaranteed
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
         else:
-            if message.text == "Нет" or message.text == "нет":
-                isGuaranteed = False
-                msg = bot.send_message(
-                    message.chat.id, "7. Фото", reply_markup=markups.photo)
-                log.close()
-                bot.register_next_step_handler(
-                    msg, finishing, wallet=message.text)
-            else:
-                isGuaranteed = True
+            if isItItem == True:
                 msg = bot.send_message(
                     message.chat.id,
                     "7. Адрес вашего TON кошелька",
                     reply_markup=markups.appeal,
                 )
+                isGuaranteed = True
                 bot.register_next_step_handler(msg, image)
-
-
-def image(message):
-    global log
-    global isItItem
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        msg = bot.send_message(message.chat.id, "Фото",
-                               reply_markup=markups.photo)
-        log.close()
-        bot.register_next_step_handler(msg, finishing, wallet=message.text)
-
-
-def finishing(message, wallet):
-    global log
-    global price
-    global isGuaranteed
-    global isItItem
-    global quantity
-
-    if isItItem:
-        item_type = "item"
-    else:
-        item_type = "service"
-
-    url = "t.me/buyforton_bot?start=" + str(message.message_id)
-    if isGuaranteed:
-        inline = telebot.types.InlineKeyboardMarkup()
-        appeal_btn = telebot.types.InlineKeyboardButton(text="Купить", url=url)
-        inline.add(appeal_btn)
-    else:
-        inline = None
-
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        loger = open(name, "r", encoding="utf-8")
-        appeal = loger.read()
-        try:
-            if message.text == "Пропустить":
-                bot.send_message(ADMIN_ID, appeal, reply_markup=inline)
             else:
-                bot.send_photo(
-                    ADMIN_ID, message.photo[1].file_id, appeal, reply_markup=inline
-                )
-            bot.send_message(
-                message.chat.id,
-                "Заявка отправлена на модерацию",
-                reply_markup=markups.main,
-            )
-        except:
-            msg = bot.send_message(
-                message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markups.appeal
-            )
-            bot.register_next_step_handler(msg, finishing)
-        try:
-            if message.text == "Пропустить":
-                bot.send_message(nextAdmin, appeal, reply_markup=inline)
-            else:
-                bot.send_photo(
-                    nextAdmin, message.photo[1].file_id, appeal, reply_markup=inline)
-        except Exception as e:
-            print(e)
-        print
-
-        connection = pymysql.connect(
-            host="localhost",
-            user="root",
-            password="8KH6Jcu00ImP",
-            database="buyforton",
-            cursorclass=pymysql.cursors.DictCursor
-        )
-
-        with connection:
-            with connection.cursor() as cursor:
-                # Create a new record
-                sql = "INSERT INTO `buyforton_appeals` (`message_id`, `nickname`, `chat_id`, `price`, `name`, `wallet`, `type`, `quantity`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-                cursor.execute(
-                    sql,
-                    (
-                        message.message_id,
-                        message.from_user.first_name,
+                if message.text == "Нет" or message.text == "нет":
+                    isGuaranteed = False
+                    msg = bot.send_message(
+                        message.chat.id, "7. Фото", reply_markup=markups.photo)
+                    log.close()
+                    bot.register_next_step_handler(
+                        msg, finishing, wallet=message.text)
+                else:
+                    isGuaranteed = True
+                    msg = bot.send_message(
                         message.chat.id,
-                        price,
-                        itemName,
-                        wallet,
-                        item_type,
-                        quantity
+                        "7. Адрес вашего TON кошелька",
+                        reply_markup=markups.appeal,
                     )
+                    bot.register_next_step_handler(msg, image)
+
+
+    def image(message):
+        global log
+        global isItItem
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            msg = bot.send_message(message.chat.id, "Фото",
+                                reply_markup=markups.photo)
+            log.close()
+            bot.register_next_step_handler(msg, finishing, wallet=message.text)
+
+
+    def finishing(message, wallet):
+        global log
+        global price
+        global isGuaranteed
+        global isItItem
+        global quantity
+
+        if isItItem:
+            item_type = "item"
+        else:
+            item_type = "service"
+
+        url = "t.me/buyforton_bot?start=" + str(message.message_id)
+        if isGuaranteed:
+            inline = telebot.types.InlineKeyboardMarkup()
+            appeal_btn = telebot.types.InlineKeyboardButton(text="Купить", url=url)
+            inline.add(appeal_btn)
+        else:
+            inline = None
+
+        if message.text == regexps.cancel:
+            bot.send_message(message.chat.id, "Отменено",
+                            reply_markup=markups.main)
+        else:
+            loger = open(name, "r", encoding="utf-8")
+            appeal = loger.read()
+            try:
+                if message.text == "Пропустить":
+                    bot.send_message(ADMIN_ID, appeal, reply_markup=inline)
+                else:
+                    bot.send_photo(
+                        ADMIN_ID, message.photo[1].file_id, appeal, reply_markup=inline
+                    )
+                bot.send_message(
+                    message.chat.id,
+                    "Заявка отправлена на модерацию",
+                    reply_markup=markups.main,
                 )
-            connection.commit()
+            except:
+                msg = bot.send_message(
+                    message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markups.appeal
+                )
+                bot.register_next_step_handler(msg, finishing)
+            try:
+                if message.text == "Пропустить":
+                    bot.send_message(nextAdmin, appeal, reply_markup=inline)
+                else:
+                    bot.send_photo(
+                        nextAdmin, message.photo[1].file_id, appeal, reply_markup=inline)
+            except Exception as e:
+                print(e)
+            print
+
+            connection = pymysql.connect(
+                host="localhost",
+                user="root",
+                password="8KH6Jcu00ImP",
+                database="buyforton",
+                cursorclass=pymysql.cursors.DictCursor
+            )
+
+            with connection:
+                with connection.cursor() as cursor:
+                    # Create a new record
+                    sql = "INSERT INTO `buyforton_appeals` (`message_id`, `nickname`, `chat_id`, `price`, `name`, `wallet`, `type`, `quantity`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                    cursor.execute(
+                        sql,
+                        (
+                            message.message_id,
+                            message.from_user.first_name,
+                            message.chat.id,
+                            price,
+                            itemName,
+                            wallet,
+                            item_type,
+                            quantity
+                        )
+                    )
+                connection.commit()
+except:
+    bot.send_message(message.chat.id, "Что-то поломалось, создайте заявку еще раз", reply_markup = markups.main)
 
 
 @bot.message_handler(regexp=regexps.support)
