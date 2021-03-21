@@ -6,6 +6,7 @@ appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 transaction = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+isServiceReusable = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 
 
 newproduct = telebot.types.KeyboardButton(regexps.newproduct)
@@ -17,6 +18,8 @@ skip = telebot.types.KeyboardButton(regexps.skip)
 vip = telebot.types.KeyboardButton(regexps.vip)
 confirm = telebot.types.KeyboardButton(regexps.confirm)
 shopcart = telebot.types.KeyboardButton(regexps.shopcart)
+reusable = telebot.types.KeyboardButton(regexps.reusable)
+disposable = telebot.types.KeyboardButton(regexps.disposable)
 back = telebot.types.InlineKeyboardButton(regexps.back, callback_data="back")
 
 main.row(newproduct, newservice)
@@ -25,6 +28,7 @@ main.row(shopcart)
 appeal.row(cancel)
 photo.row(cancel, skip)
 transaction.row(cancel, confirm)
+isServiceReusable.row(reusable, disposable)
 
 # categories
 general = telebot.types.KeyboardButton("🛍🛒Общая")

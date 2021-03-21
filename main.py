@@ -23,7 +23,7 @@ def send_welcome(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        # password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -37,35 +37,22 @@ def send_welcome(message):
 
                 with connection.cursor() as cursor:
                     # Read a single record
-                    sql = "SELECT `nickname`, `chat_id` FROM `buyforton_appeals` WHERE `message_id`=%s"
+                    sql = "SELECT `nickname`, `chat_id`, `quantity` FROM `buyforton_appeals` WHERE `message_id`=%s"
                     cursor.execute(sql, (buy_id))
                     result = cursor.fetchone()
-            buy_message = "Вы выбрали товар №{res}\n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}</a> и договоритесь об условиях доставки.\n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
-                res=buy_id, id=result['chat_id'], nickname=result['nickname']
-            )
-            buying.row("Оплатить " + str(buy_id))
-            bot.send_message(message.chat.id, buy_message, reply_markup=buying)
+            if quantity != 0:
+                buy_message = "Вы выбрали товар №{res}\n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}</a> и договоритесь об условиях доставки.\n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
+                    res=buy_id, id=result['chat_id'], nickname=result['nickname']
+                )
+                buying.row("Оплатить " + str(buy_id))
+                bot.send_message(message.chat.id, buy_message,
+                                 reply_markup=buying)
+            else:
+                bot.send_message(
+                    message.chat.id, "К сожалению, этот товар уже распродан, и мы не успели его удалить.", reply_markup=markups.main)
         except Exception as e:
             bot.send_message(message.chat.id, str(buy_id), reply_markup=buying)
             print(e)
-
-
-@bot.message_handler(commands=["admin"])
-def create_admin_panel(message):
-    print(message.chat.id in admins_list)
-    if message.chat.id in admins_list:
-        admin_btn = telebot.types.KeyboardButton("Панель администратора")
-        markups.main.row(admin_btn)
-    bot.send_message(message.chat.id, "админ панель добавлена",
-                     reply_markup=markups.main)
-
-
-@bot.message_handler(regexp="Панель администратора")
-def admin_panel(message):
-    if message.chat.id in admins_list:
-        bot.send_message(message.chat.id, "ну не сделал еще, чего бубнить-то?")
-    else:
-        bot.send_message(message.chat.id, "Пшел вон, шавка, не админ ты!")
 
 
 @bot.message_handler(commands=["ban"])
@@ -94,7 +81,7 @@ def acception(message):
             elif message.reply_to_message.caption != None:
                 for i in message.reply_to_message.caption.split("\n"):
                     if "Категория:" in i:
-                        channel_to_send = i           
+                        channel_to_send = i
             if message.text.find('!') != -1:
                 index = message.text.index("!")+1
                 new_channel = message.text[index:]
@@ -130,12 +117,12 @@ def acception(message):
             print(config.categories[channel_to_send])
             print()
             try:
-                msg = bot.send_message(
+                bot.send_message(
                     config.categories[channel_to_send], message.reply_to_message.text, reply_markup=inline)
             except:
                 photo = message.reply_to_message.photo[1].file_id
                 print(message.reply_to_message.text)
-                msg = bot.send_photo(config.categories[channel_to_send], photo,
+                bot.send_photo(config.categories[channel_to_send], photo,
                                message.reply_to_message.caption, reply_markup=inline)
 
         except Exception as e:
@@ -238,13 +225,10 @@ def def_price(message):
                 reply_markup=markups.appeal,
             )
         log.write("Описание: " + message.text + "\n")
-        if isItItem:
-            bot.register_next_step_handler(msg, delivery)
-        else:
-            bot.register_next_step_handler(msg, city)
+        bot.register_next_step_handler(msg, quantity)
 
 
-def delivery(message):
+def quantity(message):
     global log
     global isItItem
     global price
@@ -258,7 +242,7 @@ def delivery(message):
             if float(price) < 2:
                 msg = bot.send_message(
                     message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
-                bot.register_next_step_handler(msg, delivery)
+                bot.register_next_step_handler(msg, quantity)
             else:
                 log.write("Цена: " + message.text + "💎\n")
                 try:
@@ -266,70 +250,67 @@ def delivery(message):
                               '">' + message.from_user.first_name + '</a> \n')
                 except:
                     log.write("Продавец: публичное имя скрыто \n")
-                msg = bot.send_message(
-                    message.chat.id,
-                    "4.Доставка по РБ (цена и условия) ",
-                    reply_markup=markups.appeal,
-                )
-                bot.register_next_step_handler(msg, TON_wallet)
+                if isItItem:
+                    msg = bot.send_message(
+                        message.chat.id, '4. Сколько товаров вы хотите продать (только число)', reply_markup=markups.appeal)
+                    bot.register_next_step_handler(msg, delivery)
+                else:
+                    msg = bot.send_message(message.chat.id, '4. Ваша услуга:',
+                                           reply_markup=markups.isServiceReusable)
+                    bot.register_next_step_handler(msg, city)
         except Exception as e:
             msg = bot.send_message(
                 message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
-            bot.register_next_step_handler(msg, delivery)
+            bot.register_next_step_handler(msg, quantity)
             print(e)
+
+
+def delivery(message):
+    global log
+    global quantity
+    if message.text == regexps.cancel:
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
+    else:
+        quantity = message.text
+        try:
+            int(quantity)
+            if quantity == 0:
+                msg = bot.send_message(
+                    message.chat.id, "Неверный формат, необходимо ввести натуральное число. Введите ещё раз.", reply_markup=markups.appeal)
+                bot.register_next_step_handler(msg, delivery)
+            else:
+                msg = bot.send_message(
+                    message.chat.id, '5. Доставка по РБ (цена и условия)', reply_markup=markups.appeal)
+                bot.register_next_step_handler(msg, TON_wallet)
+
+        except:
+            msg = bot.send_message(
+                message.chat.id, "Неверный формат, необходимо ввести натуральное число. Введите ещё раз.", reply_markup=markups.appeal)
+            bot.register_next_step_handler(msg, delivery)
 
 
 def city(message):
     global log
     global isItItem
-    global price
-    price = message.text
+    global quantity
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено",
                          reply_markup=markups.main)
     else:
-        try:
-            float(price)
-            if float(price) < 2:
-                msg = bot.send_message(
-                    message.chat.id, "Минимум 2!", reply_markup=markups.appeal)
-                bot.register_next_step_handler(msg, delivery)
-            else:
-                log.write("Цена: " + message.text + "💎\n")
-                log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
-                          '">' + message.from_user.first_name + '</a> \n')
-                msg = bot.send_message(
-                    message.chat.id,
-                    "4.Город ",
-                    reply_markup=markups.appeal,
-                )
-                bot.register_next_step_handler(msg, guarantee)
-        except Exception as e:
+        quantity = message.text
+        
+        if quantity != "Многоразовая" and quantity != 'Одноразовая':
             msg = bot.send_message(
-                message.chat.id, "Неверный формат, необходимо ввести число. Введите ещё раз.", reply_markup=markups.appeal)
+                message.chat.id, "Не балуйся! Выбери еще раз.", reply_markup=markups.isServiceReusable)
+            bot.register_next_step_handler(msg, city)
+        elif quantity == "Многоразовая":
+            quantity = 1024
+            msg = bot.send_message(message.chat.id, '5. Город')
             bot.register_next_step_handler(msg, guarantee)
-            print(e)
-
-
-def seller(message):
-    global log
-    global isItItem
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "Отменено",
-                         reply_markup=markups.main)
-    else:
-        if isItItem:
-            log.write("Доставка: " + message.text + "\n")
-        else:
-            log.write("Город: " + message.text + "\n")
-        msg = bot.send_message(
-            message.chat.id,
-            "5. Ваш никнейм в телеграме (в формате @username)",
-            reply_markup=markups.appeal,
-        )
-        if isItItem:
-            bot.register_next_step_handler(msg, TON_wallet)
-        else:
+        elif quantity == "Одноразовая":
+            quantity = 1
+            msg = bot.send_message(message.chat.id, '5. Город')
             bot.register_next_step_handler(msg, guarantee)
 
 
@@ -345,7 +326,10 @@ def guarantee(message):
         bot.send_message(message.chat.id, "Отменено",
                          reply_markup=markups.main)
     else:
-        log.write("Доставка: " + message.text + "\n")
+        if isItItem:
+            log.write("Доставка: " + message.text + "\n")
+        else:
+            log.write("Город: " + message.text + "\n")
         msg = bot.send_message(
             message.chat.id,
             "6. Использовать гаранта?",
@@ -363,10 +347,9 @@ def TON_wallet(message):
                          reply_markup=markups.main)
     else:
         if isItItem == True:
-            log.write("Доставка: " + message.text + "\n")
             msg = bot.send_message(
                 message.chat.id,
-                "6. Адрес вашего TON кошелька",
+                "7. Адрес вашего TON кошелька",
                 reply_markup=markups.appeal,
             )
             isGuaranteed = True
@@ -406,6 +389,13 @@ def finishing(message, wallet):
     global log
     global price
     global isGuaranteed
+    global isItItem
+    global quantity
+
+    if isItItem:
+        item_type = "item"
+    else:
+        item_type = "service"
 
     url = "t.me/buyforton_bot?start=" + str(message.message_id)
     if isGuaranteed:
@@ -451,7 +441,7 @@ def finishing(message, wallet):
         connection = pymysql.connect(
             host="localhost",
             user="root",
-            password="8KH6Jcu00ImP",
+            # password="8KH6Jcu00ImP",
             database="buyforton",
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -459,7 +449,7 @@ def finishing(message, wallet):
         with connection:
             with connection.cursor() as cursor:
                 # Create a new record
-                sql = "INSERT INTO `buyforton_appeals` (`message_id`, `nickname`, `chat_id`, `price`, `name`, `wallet`) VALUES (%s, %s, %s, %s, %s, %s)"
+                sql = "INSERT INTO `buyforton_appeals` (`message_id`, `nickname`, `chat_id`, `price`, `name`, `wallet`, `type`, `quantity`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
                 cursor.execute(
                     sql,
                     (
@@ -468,7 +458,9 @@ def finishing(message, wallet):
                         message.chat.id,
                         price,
                         itemName,
-                        wallet
+                        wallet,
+                        item_type,
+                        quantity
                     )
                 )
             connection.commit()
@@ -524,7 +516,7 @@ def shopcart(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        # password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -563,7 +555,7 @@ def show_order(c):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        # password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -604,7 +596,7 @@ def send_money(c):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        # password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -655,7 +647,7 @@ def repeat_all_messages(message):
             connection = pymysql.connect(
                 host="localhost",
                 user="root",
-                password="8KH6Jcu00ImP",
+                # password="8KH6Jcu00ImP",
                 database="buyforton",
                 cursorclass=pymysql.cursors.DictCursor
             )
@@ -712,7 +704,7 @@ def confirmation_second(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        # password="8KH6Jcu00ImP",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -739,7 +731,10 @@ def confirmation_second(message):
                     sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
                     cursor.execute(
                         sql, (buy_id, message.chat.id, result["chat_id"]))
-
+                with connection.cursor() as cursor:
+                    sql = "UPDATE `quantity` = `quantity` - 1 WHERE `message_id` = %s"
+                    cursor.execute(sql, (buy_id))
+                    result_another = cursor.fetchone()
                 connection.commit()
             bot.send_message(
                 result["chat_id"],
@@ -747,9 +742,14 @@ def confirmation_second(message):
                     price=result["price"], chat_id=result["chat_id"], nickname=result["nickname"]),
                 reply_markup=markups.main
             )
+            bot.send_message(ADMIN_ID, "Удали из канала заказ " + str(buy_id))
+            for i in admins_list:
+                bot.send_message(i, "Удали из канала заказ " + str(buy_id))
             bot.send_message(
                 message.chat.id, "Операция прошла успешно", reply_markup=markups.main
             )
+            if result_another['quantity'] == 0:
+                bot.send_message(ADMIN_ID, "удалить " + str(buy_id))
         else:
             msg = bot.send_message(
                 message.chat.id, "Что-то пошло не так", reply_markup=markups.transaction
