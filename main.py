@@ -245,11 +245,6 @@ def quantity_def(message):
                 bot.register_next_step_handler(msg, quantity)
             else:
                 log.write("Цена: " + message.text + "💎\n")
-                try:
-                    log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
-                              '">' + message.from_user.first_name + '</a> \n')
-                except:
-                    log.write("Продавец: публичное имя скрыто \n")
                 if isItItem:
                     msg = bot.send_message(
                         message.chat.id, '4. Сколько товаров вы хотите продать (только число)', reply_markup=markups.appeal)
@@ -351,7 +346,11 @@ def TON_wallet(message):
             log.write("Доставка: " + message.text + "\n")
         else:
             log.write("Город: " + message.text + "\n")
-            
+        try:
+            log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
+                        '">' + message.from_user.first_name + '</a> \n')
+        except:
+            log.write("Продавец: публичное имя скрыто \n")
         if isItItem == True:
             msg = bot.send_message(
                 message.chat.id,
