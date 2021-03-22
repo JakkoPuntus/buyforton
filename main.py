@@ -347,6 +347,11 @@ def TON_wallet(message):
         bot.send_message(message.chat.id, "Отменено",
                          reply_markup=markups.main)
     else:
+        if isItItem:
+            log.write("Доставка: " + message.text + "\n")
+        else:
+            log.write("Город: " + message.text + "\n")
+            
         if isItItem == True:
             msg = bot.send_message(
                 message.chat.id,
