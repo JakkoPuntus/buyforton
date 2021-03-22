@@ -195,11 +195,11 @@ def description(message):
     else:
         if isItItem:
             msg = bot.send_message(
-                message.chat.id, "2. Описание  товара", reply_markup=markups.appeal
+                message.chat.id, "2. Описание  товара  (до 1000 символов)", reply_markup=markups.appeal
             )
         else:
             msg = bot.send_message(
-                message.chat.id, "2. Описание  услуги", reply_markup=markups.appeal
+                message.chat.id, "2. Описание  услуги  (до 1000 символов)", reply_markup=markups.appeal
             )
         log.write("Название: " + message.text + "\n")
         bot.register_next_step_handler(msg, def_price)
