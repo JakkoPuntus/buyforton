@@ -212,20 +212,24 @@ def def_price(message):
         bot.send_message(message.chat.id, "Отменено",
                          reply_markup=markups.main)
     else:
-        if isItItem:
-            msg = bot.send_message(
-                message.chat.id,
-                "3. Цена товара в TON (только число, минимум 2)",
-                reply_markup=markups.appeal,
-            )
+        if len(message.text) > 1000:
+            msg = bot.send_message(message.chat.id, "Пожалуйста, поменьше букв")
+            bot.register_next_step_handler(msg, def_price)
         else:
-            msg = bot.send_message(
-                message.chat.id,
-                "3. Цена услуги в TON (только число, минимум 2)",
-                reply_markup=markups.appeal,
-            )
-        log.write("Описание: " + message.text + "\n")
-        bot.register_next_step_handler(msg, quantity_def)
+            if isItItem:
+                msg = bot.send_message(
+                    message.chat.id,
+                    "3. Цена товара в TON (только число, минимум 2)",
+                    reply_markup=markups.appeal,
+                )
+            else:
+                msg = bot.send_message(
+                    message.chat.id,
+                    "3. Цена услуги в TON (только число, минимум 2)",
+                    reply_markup=markups.appeal,
+                )
+            log.write("Описание: " + message.text + "\n")
+            bot.register_next_step_handler(msg, quantity_def)
 
 
 def quantity_def(message):
@@ -366,7 +370,7 @@ def TON_wallet(message):
                     message.chat.id, "7. Фото", reply_markup=markups.photo)
                 log.close()
                 bot.register_next_step_handler(
-                    msg, finishing, wallet=message.text)
+                    msg, finishing, wallet="none")
             else:
                 isGuaranteed = True
                 msg = bot.send_message(
