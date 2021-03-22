@@ -315,6 +315,7 @@ def city(message):
 
 
 def guarantee(message):
+    global isItItem
     grnt = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     grnt_yes = telebot.types.KeyboardButton("Да")
     grnt_no = telebot.types.KeyboardButton("Нет")
