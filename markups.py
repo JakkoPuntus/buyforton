@@ -42,6 +42,7 @@ sport = telebot.types.KeyboardButton('⚽️🏀🏓 Товары для спо�
 adult = telebot.types.KeyboardButton('👙🔞👄 18+')
 holiday = telebot.types.KeyboardButton('🎁 К празднику')
 repair = telebot.types.KeyboardButton('🛠 Запчасти')
+dress =  telebot.types.KeyboardButton('👕👚🕶 Одежда и аксессуары')
 
 pay = telebot.types.KeyboardButton('💵💎Оплата за TON')
 general_service = telebot.types.KeyboardButton('🤝Прочие услуги')
@@ -53,7 +54,7 @@ categories_service = telebot.types.ReplyKeyboardMarkup(
     selective=False, resize_keyboard=True)
 
 categories.row(hand_made, souvenirs, food)
-categories.row(pets, holiday, digital)
+categories.row(pets, holiday, digital, dress)
 categories.row(tech, sport, repair, adult)
 categories.row(general)
 
