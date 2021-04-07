@@ -23,7 +23,7 @@ def send_welcome(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        password="9R3BhW049TF6",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -450,7 +450,7 @@ def finishing(message, wallet):
         connection = pymysql.connect(
             host="localhost",
             user="root",
-            password="8KH6Jcu00ImP",
+            password="9R3BhW049TF6",
             database="buyforton",
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -525,7 +525,7 @@ def shopcart(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        password="9R3BhW049TF6",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -564,7 +564,7 @@ def show_order(c):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        password="9R3BhW049TF6",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -605,7 +605,7 @@ def send_money(c):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        password="9R3BhW049TF6",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
@@ -656,7 +656,7 @@ def repeat_all_messages(message):
             connection = pymysql.connect(
                 host="localhost",
                 user="root",
-                password="8KH6Jcu00ImP",
+                password="9R3BhW049TF6",
                 database="buyforton",
                 cursorclass=pymysql.cursors.DictCursor
             )
@@ -713,7 +713,7 @@ def confirmation_second(message):
     connection = pymysql.connect(
         host="localhost",
         user="root",
-        password="8KH6Jcu00ImP",
+        password="9R3BhW049TF6",
         database="buyforton",
         cursorclass=pymysql.cursors.DictCursor
     )
