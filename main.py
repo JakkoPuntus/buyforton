@@ -63,72 +63,76 @@ def ban_user(message):
 
 @bot.message_handler(commands=["accept"])
 def acception(message):
-    if message.chat.id in config.admins_list:
-        inline = message.reply_to_message.reply_markup
-        new_channel = None
-        if message.text.find("!") != -1:
-            index = message.text.index("!")+1
-            new_category = message.text[index:]
-            new_category = new_category.replace(" ", "")
-
-        try:
-            channel_to_send = "dmth"
-            if message.reply_to_message.text != None:
-                for i in message.reply_to_message.text.split("\n"):
-                    if "Категория:" in i:
-                        channel_to_send = i
-                        print(channel_to_send)
-            elif message.reply_to_message.caption != None:
-                for i in message.reply_to_message.caption.split("\n"):
-                    if "Категория:" in i:
-                        channel_to_send = i
-            if message.text.find('!') != -1:
+    try:
+        if message.chat.id in config.admins_list:
+            inline = message.reply_to_message.reply_markup
+            new_channel = None
+            if message.text.find("!") != -1:
                 index = message.text.index("!")+1
-                new_channel = message.text[index:]
-                new_channel = new_channel.replace(" ", "")
+                new_category = message.text[index:]
+                new_category = new_category.replace(" ", "")
 
-                try:
-                    a = "Категория: " + \
-                        message.reply_to_message.text.replace(
-                            channel_to_send, config.commands[new_channel])
-                    print(a)
-                    bot.edit_message_text(
-                        a,
-                        message.chat.id,
-                        message.reply_to_message.id,
-                        reply_markup=inline
-                    )
-                except:
-                    a = message.reply_to_message.caption.replace(
-                        channel_to_send, config.commands[new_channel])
-
-                    print(a)
-                    bot.edit_message_caption(
-                        a,
-                        message.chat.id,
-                        message.reply_to_message.id,
-                        reply_markup=inline
-                    )
-            channel_to_send = channel_to_send.replace('Категория: ', '')
-            if new_channel != None:
-                channel_to_send = config.commands[new_channel]
-                channel_to_send = channel_to_send.replace('Категория: ', '')
-            print(channel_to_send)
-            print(config.categories[channel_to_send])
-            print()
             try:
-                bot.send_message(
-                    config.categories[channel_to_send], message.reply_to_message.text, reply_markup=inline)
-            except:
-                photo = message.reply_to_message.photo[1].file_id
-                print(message.reply_to_message.text)
-                bot.send_photo(config.categories[channel_to_send], photo,
-                               message.reply_to_message.caption, reply_markup=inline)
+                channel_to_send = "dmth"
+                if message.reply_to_message.text != None:
+                    for i in message.reply_to_message.text.split("\n"):
+                        if "Категория:" in i:
+                            channel_to_send = i
+                            print(channel_to_send)
+                elif message.reply_to_message.caption != None:
+                    for i in message.reply_to_message.caption.split("\n"):
+                        if "Категория:" in i:
+                            channel_to_send = i
+                if message.text.find('!') != -1:
+                    index = message.text.index("!")+1
+                    new_channel = message.text[index:]
+                    new_channel = new_channel.replace(" ", "")
 
-        except Exception as e:
-            print(e)
-    else:
-        bot.send_message(message.chat.id, "Вы не админ")
+                    try:
+                        a = "Категория: " + \
+                            message.reply_to_message.text.replace(
+                                channel_to_send, config.commands[new_channel])
+                        print(a)
+                        bot.edit_message_text(
+                            a,
+                            message.chat.id,
+                            message.reply_to_message.id,
+                            reply_markup=inline
+                        )
+                    except:
+                        a = message.reply_to_message.caption.replace(
+                            channel_to_send, config.commands[new_channel])
+
+                        print(a)
+                        bot.edit_message_caption(
+                            a,
+                            message.chat.id,
+                            message.reply_to_message.id,
+                            reply_markup=inline
+                        )
+                channel_to_send = channel_to_send.replace('Категория: ', '')
+                if new_channel != None:
+                    channel_to_send = config.commands[new_channel]
+                    channel_to_send = channel_to_send.replace('Категория: ', '')
+                print(channel_to_send)
+                print(config.categories[channel_to_send])
+                print()
+                try:
+                    bot.send_message(
+                        config.categories[channel_to_send], message.reply_to_message.text, reply_markup=inline)
+                except:
+                    photo = message.reply_to_message.photo[1].file_id
+                    print(message.reply_to_message.text)
+                    bot.send_photo(config.categories[channel_to_send], photo,
+                                message.reply_to_message.caption, reply_markup=inline)
+
+            except Exception as e:
+                print(e)
+        else:
+            bot.send_message(message.chat.id, "Вы не админ")
+    except Exception as e:
+        bot.send_message(message.chat.id, e, reply_markup = markups.main)
+        bot.send_message(message.chat.id, message.reply_to_message.id)
 
 
 @bot.message_handler(regexp=regexps.newproduct)
