@@ -132,7 +132,6 @@ def acception(message):
             bot.send_message(message.chat.id, "Вы не админ")
     except Exception as e:
         bot.send_message(message.chat.id, e, reply_markup = markups.main)
-        bot.send_message(message.chat.id, message.reply_to_message.id)
 
 
 @bot.message_handler(regexp=regexps.newproduct)
