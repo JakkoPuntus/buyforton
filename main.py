@@ -40,6 +40,7 @@ def send_welcome(message):
                     sql = "SELECT `nickname`, `chat_id`, `quantity` FROM `buyforton_appeals` WHERE `message_id`=%s"
                     cursor.execute(sql, (buy_id))
                     result = cursor.fetchone()
+            quantity = result['quantity']
             if quantity != 0:
                 buy_message = "Вы выбрали товар №{res}\n Перед тем, как оплатить его, обязательно свяжитесь с продавцом <a href=\"tg://user?id={id}\">{nickname}</a> и договоритесь об условиях доставки.\n Настоятельно не рекомендуем оплачивать товар до связи продавцом, ровно как и оплачивать товар напрямую у продавца. В этих случая мы не сможем гарантироать успешность сделки.".format(
                     res=buy_id, id=result['chat_id'], nickname=result['nickname']
