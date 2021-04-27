@@ -156,13 +156,13 @@ def def_category(message):
             reply_markup=markups.categories
         )
         isItItem = True
-        log.write("#товар \n")
+        #log.write("#товар \n")
     else:
         msg = bot.send_message(
             message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories_service
         )
         isItItem = False
-        log.write("#услуга \n")
+        #log.write("#услуга \n")
     bot.register_next_step_handler(msg, country)
 
 def country(message):
