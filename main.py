@@ -198,7 +198,6 @@ def def_name(message):
             msg = bot.send_message(
                 message.chat.id, "Название  услуги", reply_markup=markups.appeal
             )
-        log.write("Название: " + message.text + "\n")
         bot.register_next_step_handler(msg, description)
 
 
