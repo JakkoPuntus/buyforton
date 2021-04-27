@@ -299,7 +299,7 @@ def delivery(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 msg = bot.send_message(
-                    message.chat.id, 'Доставка по РБ (цена и условия)', reply_markup=markups.appeal)
+                    message.chat.id, 'Доставка (цена и условия)', reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, TON_wallet)
 
         except:
