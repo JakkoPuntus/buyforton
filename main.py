@@ -12,7 +12,7 @@ import logging
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import os
 
-bot = telebot.TeleBot(config.DEBUG_TOKEN, num_threads=4, parse_mode="HTML")
+bot = telebot.TeleBot(TOKEN, num_threads=4, parse_mode="HTML")
 logging.basicConfig(level=logging.DEBUG)
 
 
