@@ -12,7 +12,7 @@ import logging
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import os
 
-bot = telebot.TeleBot(TOKEN, num_threads=4, parse_mode="HTML")
+bot = telebot.TeleBot(config.DEBUG_TOKEN, num_threads=4, parse_mode="HTML")
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -137,6 +137,7 @@ def acception(message):
 
 @bot.message_handler(regexp=regexps.newproduct)
 @bot.message_handler(regexp=regexps.newservice)
+
 def def_category(message):
     global log
     global name
@@ -162,29 +163,43 @@ def def_category(message):
         )
         isItItem = False
         log.write("#услуга \n")
-    bot.register_next_step_handler(msg, def_name)
+    bot.register_next_step_handler(msg, country)
 
-
-def def_name(message):
+def country(message):
     global log
     global name
     global isItItem
     try:
         if message.text in config.categories and message.text != '💵💎Оплата за TON' and message.text != '🤝Прочие услуги':
             msg = bot.send_message(
-                message.chat.id, "1. Название товара", reply_markup=markups.appeal
+                message.chat.id, "Ваша страна", reply_markup=markups.countries
             )
             isItItem = True
             log.write("Категория: " + message.text + "\n")
-        else:
-            msg = bot.send_message(
-                message.chat.id, "1. Название услуги", reply_markup=markups.appeal
-            )
-            isItItem = False
-            log.write("Категория: " + message.text + "\n")
     except Exception as e:
         print(e)
-    bot.register_next_step_handler(msg, description)
+    bot.register_next_step_handler(msg, def_name)
+
+def def_name(message):
+    global log
+    global isItItem
+    global Country
+    Country = message.text
+
+    if message.text == regexps.cancel:
+        bot.send_message(message.chat.id, "Отменено",
+                         reply_markup=markups.main)
+    else:
+        if isItItem:
+            msg = bot.send_message(
+                message.chat.id, "Название товара", reply_markup=markups.appeal
+            )
+        else:
+            msg = bot.send_message(
+                message.chat.id, "Название  услуги", reply_markup=markups.appeal
+            )
+        log.write("Название: " + message.text + "\n")
+        bot.register_next_step_handler(msg, description)
 
 
 def description(message):
@@ -199,11 +214,11 @@ def description(message):
     else:
         if isItItem:
             msg = bot.send_message(
-                message.chat.id, "2. Описание  товара  (до 1000 символов)", reply_markup=markups.appeal
+                message.chat.id, "Описание  товара  (до 1000 символов)", reply_markup=markups.appeal
             )
         else:
             msg = bot.send_message(
-                message.chat.id, "2. Описание  услуги  (до 1000 символов)", reply_markup=markups.appeal
+                message.chat.id, "Описание  услуги  (до 1000 символов)", reply_markup=markups.appeal
             )
         log.write("Название: " + message.text + "\n")
         bot.register_next_step_handler(msg, def_price)
@@ -223,13 +238,13 @@ def def_price(message):
             if isItItem:
                 msg = bot.send_message(
                     message.chat.id,
-                    "3. Цена товара в TON (только число, минимум 2)",
+                    "Цена товара в TON (только число, минимум 2)",
                     reply_markup=markups.appeal,
                 )
             else:
                 msg = bot.send_message(
                     message.chat.id,
-                    "3. Цена услуги в TON (только число, минимум 2)",
+                    "Цена услуги в TON (только число, минимум 2)",
                     reply_markup=markups.appeal,
                 )
             log.write("Описание: " + message.text + "\n")
@@ -255,7 +270,7 @@ def quantity_def(message):
                 log.write("Цена: " + message.text + "💎\n")
                 if isItItem:
                     msg = bot.send_message(
-                        message.chat.id, '4. Сколько товаров вы хотите продать (только число)', reply_markup=markups.appeal)
+                        message.chat.id, 'Сколько товаров вы хотите продать (только число)', reply_markup=markups.appeal)
                     bot.register_next_step_handler(msg, delivery)
                 else:
                     msg = bot.send_message(message.chat.id, '4. Ваша услуга:',
@@ -284,7 +299,7 @@ def delivery(message):
                 bot.register_next_step_handler(msg, delivery)
             else:
                 msg = bot.send_message(
-                    message.chat.id, '5. Доставка по РБ (цена и условия)', reply_markup=markups.appeal)
+                    message.chat.id, 'Доставка по РБ (цена и условия)', reply_markup=markups.appeal)
                 bot.register_next_step_handler(msg, TON_wallet)
 
         except:
@@ -309,11 +324,11 @@ def city(message):
             bot.register_next_step_handler(msg, city)
         elif quantity == "Многоразовая":
             quantity = 1024
-            msg = bot.send_message(message.chat.id, '5. Город')
+            msg = bot.send_message(message.chat.id, 'Город')
             bot.register_next_step_handler(msg, guarantee)
         elif quantity == "Одноразовая":
             quantity = 1
-            msg = bot.send_message(message.chat.id, '5. Город')
+            msg = bot.send_message(message.chat.id, 'Город')
             bot.register_next_step_handler(msg, guarantee)
 
 
@@ -336,7 +351,7 @@ def guarantee(message):
             log.write("Город: " + message.text + "\n")
         msg = bot.send_message(
             message.chat.id,
-            "6. Использовать гаранта?",
+            "Использовать гаранта?",
             reply_markup=grnt,
         )
         bot.register_next_step_handler(msg, TON_wallet)
@@ -362,7 +377,7 @@ def TON_wallet(message):
         if isItItem == True:
             msg = bot.send_message(
                 message.chat.id,
-                "7. Адрес вашего TON кошелька",
+                "Адрес вашего TON кошелька",
                 reply_markup=markups.appeal,
             )
             isGuaranteed = True
@@ -371,7 +386,7 @@ def TON_wallet(message):
             if message.text == "Нет" or message.text == "нет":
                 isGuaranteed = False
                 msg = bot.send_message(
-                    message.chat.id, "7. Фото", reply_markup=markups.photo)
+                    message.chat.id, "Фото", reply_markup=markups.photo)
                 log.close()
                 bot.register_next_step_handler(
                     msg, finishing, wallet="none")
@@ -379,7 +394,7 @@ def TON_wallet(message):
                 isGuaranteed = True
                 msg = bot.send_message(
                     message.chat.id,
-                    "7. Адрес вашего TON кошелька",
+                    "Адрес вашего TON кошелька",
                     reply_markup=markups.appeal,
                 )
                 bot.register_next_step_handler(msg, image)
@@ -404,6 +419,7 @@ def finishing(message, wallet):
     global isGuaranteed
     global isItItem
     global quantity
+    global Country
 
     if isItItem:
         item_type = "item"
@@ -424,6 +440,7 @@ def finishing(message, wallet):
     else:
         loger = open(name, "r", encoding="utf-8")
         appeal = loger.read()
+        appeal = '#' + config.countries[Country] + '\n' + appeal
         try:
             if message.text == "Пропустить":
                 bot.send_message(ADMIN_ID, appeal, reply_markup=inline)

@@ -59,3 +59,15 @@ categories.row(tech, sport, repair, adult)
 categories.row(general)
 
 categories_service.row(pay, general_service)
+
+#countries
+by = telebot.types.KeyboardButton(regexps.by)
+ru = telebot.types.KeyboardButton(regexps.ru)
+ua = telebot.types.KeyboardButton(regexps.ua)
+kz = telebot.types.KeyboardButton(regexps.kz)
+ot = telebot.types.KeyboardButton(regexps.ot)
+
+countries = telebot.types.ReplyKeyboardMarkup(
+    selective=False, resize_keyboard=True)
+countries.row(by, ru, ua, kz)
+countries.row(ot)
