@@ -143,7 +143,7 @@ def def_category(message):
     global name
     global isItItem
     name = str(message.chat.id) + ".txt"
-
+    msg = "Заглушка"
     try:
         log = open(name, "x+", encoding="utf-8")
     except:
@@ -354,7 +354,6 @@ def guarantee(message):
             reply_markup=grnt,
         )
         bot.register_next_step_handler(msg, TON_wallet)
-
 
 def TON_wallet(message):
     global log
