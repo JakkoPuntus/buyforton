@@ -171,14 +171,22 @@ def country(message):
     global isItItem
     try:
         if message.text in config.categories and message.text != '💵💎Оплата за TON' and message.text != '🤝Прочие услуги':
-            msg = bot.send_message(
-                message.chat.id, "Ваша страна", reply_markup=markups.countries
-            )
             isItItem = True
-            log.write("Категория: " + message.text + "\n")
+
+        elif message.text == '💵💎Оплата за TON' or message.text == '🤝Прочие услуги':
+            isItItem = False
+
+        msg = bot.send_message(
+            message.chat.id, "Ваша страна", reply_markup=markups.countries
+        )      
+
+        log.write("Категория: " + message.text + "\n")
+        bot.register_next_step_handler(msg, def_name)
     except Exception as e:
         print(e)
-    bot.register_next_step_handler(msg, def_name)
+        msg = bot.send_message(
+            message.chat.id, "К сожалению, что-то пошло не так", reply_markup=markups.main )
+    
 
 def def_name(message):
     global log
