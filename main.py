@@ -374,7 +374,7 @@ def TON_wallet(message):
         if isItItem:
             log.write("Доставка: " + message.text + "\n")
         else:
-            log.write("Город: " + message.text + "\n")
+            pass
         try:
             log.write('Продавец: <a href="tg://user?id=' + str(message.chat.id) +
                         '">' + message.from_user.first_name + '</a> \n')
