@@ -237,7 +237,7 @@ def def_price(message):
     if message.text == regexps.cancel:
         bot.send_message(message.chat.id, "Отменено",
                          reply_markup=markups.main)
-    else:
+    else: 
         if len(message.text) > 1000:
             msg = bot.send_message(message.chat.id, "Пожалуйста, поменьше букв")
             bot.register_next_step_handler(msg, def_price)
@@ -395,7 +395,7 @@ def TON_wallet(message):
                     message.chat.id, "Фото", reply_markup=markups.photo)
                 log.close()
                 bot.register_next_step_handler(
-                    msg, finishing, wallet="none")
+                    msg, finishing, wallet="wallet")
             else:
                 isGuaranteed = True
                 msg = bot.send_message(
