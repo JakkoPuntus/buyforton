@@ -3,7 +3,8 @@ import struct
 TOKEN = "1453628529:AAGXPfrDPvsfHdywv65OqyDmoZiad-mSZng"
 DEBUG_TOKEN = "1415540544:AAFdPPVCD5tLmOxgaOr034T9vso33z48LAU"
 ADMIN_ID = 564941525
-nextAdmin = 954657975
+nextAdmin = 564941525
+#nextAdmin = 954657975
 
 admins_list = [564941525, 954657975]
 
