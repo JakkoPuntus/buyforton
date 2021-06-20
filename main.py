@@ -383,7 +383,7 @@ def TON_wallet(message):
         if isItItem == True:
             msg = bot.send_message(
                 message.chat.id,
-                "Адрес вашего TON кошелька",
+                "Адрес вашего TON кошелька (только 0:xxxx формат!)",
                 reply_markup=markups.appeal,
             )
             isGuaranteed = True
@@ -419,7 +419,7 @@ def image(message):
         bot.register_next_step_handler(msg, finishing, wallet=message.text)
 
 
-def finishing(message, wallet):
+def finishing(message, wallet = "0:cc11d2eb7ca61c42c4b66b7e21810c5665fa5a0fdd6c6ed2fd790a62b344e6c9"):
     global log
     global price
     global isGuaranteed
@@ -756,6 +756,10 @@ def confirmation_second(message):
             and msg_chk["messages"][0]["dst"] == TON_ADRESS
             and tr_chk["transactions"][0]["balance_delta"] <= config.float_to_hex(price)
         ):
+            print('transaction info')
+            print(tr_chk["transactions"][0]["status"] == 3
+            and msg_chk["messages"][0]["dst"] == TON_ADRESS
+            and tr_chk["transactions"][0]["balance_delta"] <= config.float_to_hex(price))
 
             with connection:
                 with connection.cursor() as cursor:
@@ -766,9 +770,9 @@ def confirmation_second(message):
                 with connection.cursor() as cursor:
                     sql = "INSERT INTO `shopwheels` (`message_id`, `user_id`, `seller_id`) VALUES (%s, %s, %s)"
                     cursor.execute(
-                        sql, (buy_id, message.chat.id, result["chat_id"]))
+                            sql, (buy_id, message.chat.id, result["chat_id"]))
                 with connection.cursor() as cursor:
-                    sql = "UPDATE `quantity` = `quantity` - 1 WHERE `message_id` = %s"
+                    sql = "UPDATE `buyforton_appeals` SET `quantity` = `quantity`- 1 WHERE `message_id` = %s"
                     cursor.execute(sql, (buy_id))
                     result_another = cursor.fetchone()
                 connection.commit()
@@ -784,17 +788,19 @@ def confirmation_second(message):
             bot.send_message(
                 message.chat.id, "Операция прошла успешно", reply_markup=markups.main
             )
-            if result_another['quantity'] == 0:
-                bot.send_message(ADMIN_ID, "удалить " + str(buy_id))
+        
         else:
             msg = bot.send_message(
                 message.chat.id, "Что-то пошло не так", reply_markup=markups.transaction
             )
             bot.register_next_step_handler(msg, confirmation)
-    except:
+    except Exception as e:
         msg = bot.send_message(
             message.chat.id, "Что-то пошло не так. Отправьте id транзакции еще раз.", reply_markup=markups.transaction
         )
+        print('exception is')
+        print(e)
+        
         bot.register_next_step_handler(msg, confirmation_second)
 
 
