@@ -641,16 +641,17 @@ def send_money(c):
         with connection.cursor() as cursor:
             # Read a single record
             sql = (
-                "SELECT `wallet`, `price` FROM `buyforton_appeals` WHERE `message_id`=%s"
+                "SELECT `wallet`, `price`, `quantity` FROM `buyforton_appeals` WHERE `message_id`=%s"
             )
             cursor.execute(sql, (buy_id))
             result = cursor.fetchone()
         with connection.cursor() as cursor:
             # Read a single record
-            sql = (
-                "DELETE FROM `buyforton_appeals` WHERE `message_id` = %s"
-            )
-            cursor.execute(sql, (buy_id))
+            if result['quantity'] == 0:
+                sql = (
+                    "DELETE FROM `buyforton_appeals` WHERE `message_id` = %s"
+                )
+                cursor.execute(sql, (buy_id))
         with connection.cursor() as cursor:
             # Read a single record
             sql = (

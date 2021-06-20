@@ -1,5 +1,6 @@
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
+import config
 
 
 def check_transaction(transaction):
@@ -58,9 +59,3 @@ def check_message(message):
   # Execute the query on the transport
   result = client.execute(query)
   return result
-tr = check_transaction("f055324d031bcc5cf411e5ea5fb41900e3561c99a13403055fb594a18289e6d6")
-a = tr["transactions"][0]["out_msgs"][0]
-print(a)
-print("s")
-msg = check_message(a)
-print(msg["messages"][0]["dst"])
