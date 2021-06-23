@@ -41,4 +41,3 @@ def send_ton(address, amount):
     response = requests.post(
         'https://api.kuna.io/v3/auth/withdraw', headers=headers, data=body)
     return response
-

@@ -780,12 +780,12 @@ def confirmation_second(message):
             bot.send_message(
                 result["chat_id"],
                 'Ваш товар ценой {price} TON оплачен юзером <a href="tg://user?id={chat_id}">{nickname}</a> '.format(
-                    price=result["price"], chat_id=result["chat_id"], nickname=result["nickname"]),
+                    price=result["price"], chat_id=message.chat.id, nickname=message.from_user.username),
                 reply_markup=markups.main
             )
-            bot.send_message(ADMIN_ID, "Удали из канала заказ " + str(buy_id))
-            for i in admins_list:
-                bot.send_message(i, "Удали из канала заказ " + str(buy_id))
+            #bot.send_message(ADMIN_ID, "Удали из канала заказ " + str(buy_id))
+            #for i in admins_list:
+            #    bot.send_message(i, "Удали из канала заказ " + str(buy_id))
             bot.send_message(
                 message.chat.id, "Операция прошла успешно", reply_markup=markups.main
             )
