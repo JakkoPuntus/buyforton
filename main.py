@@ -660,8 +660,6 @@ def send_money(c):
             cursor.execute(sql, (buy_id))
         connection.commit()
 
-    bot.send_message(c.message.chat.id,
-                     result['wallet'] + " " + str(result['price']))
     if result["price"] * 0.03 < 0.5:
         withdraw_result = withdraw.send_ton(result['wallet'], result['price'] - 0.4)
     else:
