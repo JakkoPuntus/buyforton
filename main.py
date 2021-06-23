@@ -663,10 +663,11 @@ def send_money(c):
     bot.send_message(c.message.chat.id,
                      result['wallet'] + " " + str(result['price']))
     if result["price"] * 0.03 < 0.5:
-        withdraw.send_ton(result['wallet'], result['price'] - 0.4)
+        withdraw_result = withdraw.send_ton(result['wallet'], result['price'] - 0.4)
     else:
-        withdraw.send_ton(result['wallet'],
+        withdraw_result = withdraw.send_ton(result['wallet'],
                           result['price'] - result['price'] * 0.03)
+    print(withdraw_result)
 
 
 @bot.message_handler(content_types=["text"])
@@ -789,6 +790,7 @@ def confirmation_second(message):
             bot.send_message(
                 message.chat.id, "Операция прошла успешно", reply_markup=markups.main
             )
+            
         
         else:
             msg = bot.send_message(
