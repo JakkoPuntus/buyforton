@@ -135,7 +135,7 @@ def acception(message):
     except Exception as e:
         bot.send_message(message.chat.id, e, reply_markup = markups.main)
 
-@bot.message_handler(commnds=['exchange'])
+@bot.message_handler(commands=['exchange'])
 def exchanger(message):
     rub = exchange.get_exchange_rub()
     bot.send_message(message.chat.id, 'ton crystal= ' + rub + '₽')
