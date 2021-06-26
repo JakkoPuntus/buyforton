@@ -137,7 +137,7 @@ def acception(message):
 
 @bot.message_handler(commands=['exchange'])
 def exchanger(message):
-    rub = exchange.get_exchange_rub()
+    rub = str(exchange.get_exchange_rub())
     bot.send_message(message.chat.id, 'ton crystal= ' + rub + '₽')
 
 
