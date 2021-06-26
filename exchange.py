@@ -1,8 +1,9 @@
 import requests
+import ast
 
-def get_exchange():
-    headers = {'api-key': 'Ki0U3HWIMoPrNpi'}
-    response = requests.get('https://api.broxus.com/v1/meta/currencies_pairs', headers=headers)
-    return response
+def get_exchange_rub():
+    headers = {'ids': 'ton-crystal', 'vs_currencies': 'rub, usd'}
+    response = requests.get('https://api.coingecko.com/api/v3/simple/price', params=headers)
+    return ast.literal_eval(response.text)['ton-crystal']['rub']
 
 print(get_exchange())

@@ -9,6 +9,7 @@ import pymysql.cursors
 import config
 import withdraw
 import logging
+import exchange
 from config import TOKEN, ADMIN_ID, nextAdmin, hello_text, TON_ADRESS, admins_list
 import os
 
@@ -133,6 +134,11 @@ def acception(message):
             bot.send_message(message.chat.id, "Вы не админ")
     except Exception as e:
         bot.send_message(message.chat.id, e, reply_markup = markups.main)
+
+@bot.message_handler(commnds=['exchange'])
+def exchanger(message):
+    rub = exchange.get_exchange_rub()
+    bot.send_message(message.chat.id, 'ton crystal= ' + rub + '₽')
 
 
 @bot.message_handler(regexp=regexps.newproduct)
@@ -459,17 +465,25 @@ def finishing(message, wallet = "0:cc11d2eb7ca61c42c4b66b7e21810c5665fa5a0fdd6c6
                 "Заявка отправлена на модерацию",
                 reply_markup=markups.main,
             )
+
         except:
             msg = bot.send_message(
                 message.chat.id, "Упс, попробуйте ещё раз", reply_markup=markups.appeal
             )
             bot.register_next_step_handler(msg, finishing)
+        
+        
+
         try:
             if message.text == "Пропустить":
                 bot.send_message(nextAdmin, appeal, reply_markup=inline)
             else:
                 bot.send_photo(
                     nextAdmin, message.photo[1].file_id, appeal, reply_markup=inline)
+
+            bot.send_message(ADMIN_ID, message.chat.id)
+            bot.send_message(nextAdmin, message.chat.id)
+
         except Exception as e:
             print(e)
         print
