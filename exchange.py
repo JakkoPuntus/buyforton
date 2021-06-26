@@ -6,4 +6,3 @@ def get_exchange_rub():
     response = requests.get('https://api.coingecko.com/api/v3/simple/price', params=headers)
     return ast.literal_eval(response.text)['ton-crystal']['rub']
 
-print(get_exchange())
