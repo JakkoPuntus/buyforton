@@ -518,25 +518,9 @@ def finishing(message, wallet = "0:cc11d2eb7ca61c42c4b66b7e21810c5665fa5a0fdd6c6
 
 
 @bot.message_handler(regexp=regexps.support)
-def support_first(message):
-    msg = bot.send_message(
-        message.chat.id, "Задайте свой вопрос модераторам", reply_markup=markups.appeal
-    )
-    bot.register_next_step_handler(msg, support)
-
-
 def support(message):
-    if message.text == regexps.cancel:
-        bot.send_message(message.chat.id, "отменено",
-                         reply_markup=markups.main)
-    else:
-        bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
-        bot.forward_message(nextAdmin, message.chat.id, message.message_id)
-        bot.send_message(
-            message.chat.id,
-            "Ваше обращение принято, мы вам ответим",
-            reply_markup=markups.main,
-        )
+    support_markup = telebot.types.InlineKeyboardMarkup().add(telebot.types.InlineKeyboardButton('💬 Написать нам', url = 'http://t.me/buyforton_support_bot'))
+    bot.send_message('Отправьте нам своё предложение, жалобу или вопрос и наша техподдержка вам обязательно ответит', reply_markup = support_markup)
 
 
 @bot.message_handler(regexp=regexps.donate)
