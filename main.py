@@ -520,7 +520,7 @@ def finishing(message, wallet = "0:cc11d2eb7ca61c42c4b66b7e21810c5665fa5a0fdd6c6
 @bot.message_handler(regexp=regexps.support)
 def support(message):
     support_markup = telebot.types.InlineKeyboardMarkup().add(telebot.types.InlineKeyboardButton('💬 Написать нам', url = 'http://t.me/buyforton_support_bot'))
-    bot.send_message('Отправьте нам своё предложение, жалобу или вопрос и наша техподдержка вам обязательно ответит', reply_markup = support_markup)
+    bot.send_message(message.chat.id, 'Отправьте нам своё предложение, жалобу или вопрос и наша техподдержка вам обязательно ответит', reply_markup = support_markup)
 
 
 @bot.message_handler(regexp=regexps.donate)
