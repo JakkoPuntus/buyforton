@@ -141,12 +141,9 @@ def exchanger(message):
     rub = str(exchange.get_exchange_rub())
     usd = str(round(exchange.get_exchange_usd(), 2))
     bot.edit_message_text(chat_id = message.chat.id, message_id = msg.id, text = 'TON Crystal = ' + rub + '₽\n' + 'TON Crystal = ' + usd + '$')
-    #bot.send_message(message.chat.id, 'TON Crystal = ' + rub + '₽\n' + 'TON Crystal = ' + usd + '$')
-
 
 @bot.message_handler(regexp=regexps.newproduct)
 @bot.message_handler(regexp=regexps.newservice)
-
 def def_category(message):
     global log
     global name
@@ -161,14 +158,14 @@ def def_category(message):
 
     if message.text == regexps.newproduct:
         msg = bot.send_message(
-            message.chat.id, "Пожалуйста, выберите категорию товара",
+            message.chat.id, "Выберите категорию товара",
             reply_markup=markups.categories
         )
         isItItem = True
         #log.write("#товар \n")
     else:
         msg = bot.send_message(
-            message.chat.id, "Пожалуйста, выберите категорию услуги:", reply_markup=markups.categories_service
+            message.chat.id, "Выберите категорию товара", reply_markup=markups.categories_service
         )
         isItItem = False
         #log.write("#услуга \n")
@@ -186,7 +183,7 @@ def country(message):
             isItItem = False
 
         msg = bot.send_message(
-            message.chat.id, "Ваша страна", reply_markup=markups.countries
+            message.chat.id, "Вашу страну", reply_markup=markups.countries
         )      
 
         log.write("Категория: " + message.text + "\n")
@@ -254,13 +251,13 @@ def def_price(message):
             if isItItem:
                 msg = bot.send_message(
                     message.chat.id,
-                    "Цена товара в TON (только число, минимум 2)",
+                    "Цену товара в TON (только число, минимум 2)",
                     reply_markup=markups.appeal,
                 )
             else:
                 msg = bot.send_message(
                     message.chat.id,
-                    "Цена услуги в TON (только число, минимум 2)",
+                    "Цену услуги в TON (только число, минимум 2)",
                     reply_markup=markups.appeal,
                 )
             log.write("Описание: " + message.text + "\n")
