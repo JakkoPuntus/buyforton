@@ -1,7 +1,7 @@
 import telebot
 import regexps
 
-main = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, input_field_placeholder='Главное меню')
+main = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 appeal = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 photo = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
