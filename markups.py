@@ -8,7 +8,6 @@ buying = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 transaction = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 isServiceReusable = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-
 newproduct = telebot.types.KeyboardButton(regexps.newproduct)
 newservice = telebot.types.KeyboardButton(regexps.newservice)
 support = telebot.types.KeyboardButton(regexps.support)

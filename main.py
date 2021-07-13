@@ -139,7 +139,7 @@ def acception(message):
 def exchanger(message):
     msg = bot.send_message(message.chat.id, 'Внимательно высчитываем курс...')
     rub = str(exchange.get_exchange_rub())
-    usd = str(round(exchange.get_exchange_usd(), 2))
+    usd = str(round(exchange.get_exchange_usd(), 4))
     bot.edit_message_text(chat_id = message.chat.id, message_id = msg.id, text = 'TON Crystal = ' + rub + '₽\n' + 'TON Crystal = ' + usd + '$')
 
 @bot.message_handler(regexp=regexps.newproduct)
